@@ -1,0 +1,1595 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SHAHRIYAR MOMENY — Now Serving Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Press+Start+2P&family=Silkscreen:wght@400;700&family=Vazirmatn:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-black: #050505;
+      --bg-dark: #0e0e11;
+      --bg-panel: #16161a;
+      --bg-gray-mid: #27272c;
+      --border-dim: #333338;
+      --border-light: #71717a;
+      --border-white: #ffffff;
+      --text-white: #ffffff;
+      --text-light: #d4d4d8;
+      --text-gray: #8e8e96;
+      --font-arcade: 'Press Start 2P', monospace;
+      --font-pixel: 'Silkscreen', monospace;
+      --font-mono: 'JetBrains Mono', monospace;
+      --font-fa: 'Vazirmatn', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      image-rendering: pixelated;
+    }
+
+    html {
+      background-color: var(--bg-black);
+      color: var(--text-white);
+      font-family: var(--font-mono);
+      scroll-behavior: smooth;
+      line-height: 1.6;
+    }
+
+    html[lang="fa"] {
+      font-family: var(--font-fa);
+    }
+
+    body {
+      background-color: var(--bg-black);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* CRT Scanline & Dither Utilities */
+    .scanlines::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(
+        rgba(18, 16, 16, 0) 50%, 
+        rgba(0, 0, 0, 0.35) 50%
+      );
+      background-size: 100% 4px;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    .dither-pattern {
+      background-image: radial-gradient(rgba(255, 255, 255, 0.14) 1px, transparent 0);
+      background-size: 6px 6px;
+    }
+
+    .checker-pattern {
+      background-image: 
+        linear-gradient(45deg, #18181c 25%, transparent 25%), 
+        linear-gradient(-45deg, #18181c 25%, transparent 25%), 
+        linear-gradient(45deg, transparent 75%, #18181c 75%), 
+        linear-gradient(-45deg, transparent 75%, #18181c 75%);
+      background-size: 8px 8px;
+      background-position: 0 0, 0 4px, 4px -4px, -4px 0;
+    }
+
+    /* =========================================================
+       1. RETRO ARCADE INTRO SPLASH SCREEN ("BYE BYE GHOL")
+       ========================================================= */
+    #intro-splash {
+      position: fixed;
+      inset: 0;
+      background-color: #000000;
+      z-index: 5000;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      padding: 3.5rem 1.5rem 2.5rem;
+      text-align: center;
+      direction: ltr;
+      transition: opacity 0.45s steps(6), transform 0.45s steps(6);
+      overflow: hidden;
+    }
+
+    #intro-splash.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(1.06);
+    }
+
+    #starfield {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .splash-top,
+    .splash-center,
+    .splash-footer {
+      position: relative;
+      z-index: 2;
+    }
+
+    .series-badge {
+      display: inline-block;
+      border: 3px solid var(--text-white);
+      padding: 0.55rem 1.35rem;
+      font-family: var(--font-pixel);
+      font-size: clamp(0.75rem, 2vw, 1.05rem);
+      letter-spacing: 0.25em;
+      color: var(--text-white);
+      background: #000000;
+      box-shadow: 0 0 0 2px #000, inset 0 0 0 2px #000;
+      text-transform: uppercase;
+    }
+
+    /* 3D Cracked Monolith Pixel Title Inspired by Reference */
+    .monolith-title-wrap {
+      margin: 1.5rem 0 1rem;
+      position: relative;
+      display: inline-block;
+    }
+
+    .monolith-title {
+      font-family: var(--font-arcade);
+      font-size: clamp(2.3rem, 7.5vw, 5.4rem);
+      line-height: 1.18;
+      text-transform: uppercase;
+      color: #ffffff;
+      letter-spacing: 0.06em;
+      /* 1-Bit Brick/Crack Texture inside letters */
+      background-image: 
+        repeating-linear-gradient(0deg, #ffffff 0px, #ffffff 6px, #000000 6px, #000000 8px),
+        repeating-linear-gradient(90deg, #ffffff 0px, #ffffff 14px, #000000 14px, #000000 16px);
+      background-blend-mode: multiply;
+      -webkit-background-clip: text;
+      background-clip: text;
+      /* Deep 3D Extruded Block Shadow */
+      text-shadow: 
+        3px 3px 0px #000000,
+        -2px -2px 0px #000000,
+        0px 4px 0px #71717a,
+        0px 8px 0px #52525b,
+        0px 12px 0px #27272a,
+        0px 16px 0px #000000,
+        6px 16px 0px #ffffff,
+        -6px 16px 0px #ffffff;
+      transform: perspective(380px) rotateX(14deg);
+      padding: 0.25rem 0.5rem 1rem;
+    }
+
+    .tm-mark {
+      font-family: var(--font-pixel);
+      font-size: 0.75rem;
+      vertical-align: top;
+      margin-left: 0.35rem;
+      color: var(--text-white);
+    }
+
+    .alpha-sub {
+      font-family: var(--font-pixel);
+      font-size: 0.75rem;
+      color: var(--text-light);
+      letter-spacing: 0.2em;
+      margin-top: 0.8rem;
+      text-transform: uppercase;
+    }
+
+    .tagline-sub {
+      font-family: var(--font-pixel);
+      font-size: clamp(0.85rem, 2.2vw, 1.25rem);
+      color: var(--text-white);
+      letter-spacing: 0.18em;
+      margin-top: 0.35rem;
+      margin-bottom: 2.5rem;
+      text-transform: uppercase;
+    }
+
+    .arcade-menu {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.15rem;
+      width: 100%;
+      max-width: 340px;
+      margin: 0 auto;
+    }
+
+    .arcade-btn {
+      width: 100%;
+      padding: 0.85rem 1.5rem;
+      font-family: var(--font-arcade);
+      font-size: clamp(0.95rem, 2vw, 1.2rem);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-white);
+      background: #000000;
+      border: 3px solid transparent;
+      cursor: pointer;
+      text-decoration: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.65rem;
+      transition: all 0.1s steps(2);
+      position: relative;
+    }
+
+    .arcade-btn.primary,
+    .arcade-btn:hover,
+    .arcade-btn:focus-visible {
+      border-color: var(--text-white);
+      box-shadow: 0 0 0 2px #000000, 4px 4px 0px #71717a;
+      background: #000000;
+      color: var(--text-white);
+      outline: none;
+    }
+
+    .arcade-btn::before {
+      content: "▪";
+      font-size: 0.8em;
+      opacity: 0;
+      transition: opacity 0.1s steps(2);
+    }
+
+    .arcade-btn.primary::before,
+    .arcade-btn:hover::before {
+      opacity: 1;
+      animation: blink 0.8s steps(2, start) infinite;
+    }
+
+    .arcade-btn.secondary {
+      color: var(--text-gray);
+      border-color: #27272c;
+    }
+
+    .arcade-btn.secondary:hover {
+      color: var(--text-white);
+      border-color: var(--text-white);
+    }
+
+    .splash-footer {
+      font-family: var(--font-pixel);
+      font-size: clamp(0.7rem, 1.6vw, 0.92rem);
+      letter-spacing: 0.14em;
+      color: var(--text-light);
+      text-transform: uppercase;
+    }
+
+    @keyframes blink {
+      to { visibility: hidden; }
+    }
+
+    /* =========================================================
+       2. "NOW SERVING" PIXEL-ART MONOCHROME PORTFOLIO LAYOUT
+       ========================================================= */
+    .now-serving-shell {
+      max-width: 1280px;
+      margin: 0 auto;
+      border-left: 2px solid var(--border-white);
+      border-right: 2px solid var(--border-white);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-color: var(--bg-dark);
+    }
+
+    /* Top Marquee Ticker ("Now Serving" Signature Feature) */
+    .ticker-wrap {
+      width: 100%;
+      background-color: var(--text-white);
+      color: var(--bg-black);
+      border-bottom: 2px solid var(--border-white);
+      overflow: hidden;
+      white-space: nowrap;
+      padding: 0.45rem 0;
+      font-family: var(--font-pixel);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      direction: ltr;
+    }
+
+    .ticker-move {
+      display: inline-block;
+      animation: ticker 28s linear infinite;
+    }
+
+    @keyframes ticker {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* Status & Counter Header Bar */
+    .counter-header {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      border-bottom: 2px solid var(--border-white);
+      background: var(--bg-black);
+    }
+
+    .brand-block {
+      grid-column: span 5;
+      padding: 1.5rem;
+      border-right: 2px solid var(--border-white);
+      display: flex;
+      align-items: center;
+      gap: 1.15rem;
+    }
+
+    html[dir="rtl"] .brand-block {
+      border-right: none;
+      border-left: 2px solid var(--border-white);
+    }
+
+    .brand-stamp {
+      width: 56px;
+      height: 56px;
+      border: 2px solid var(--border-white);
+      background: var(--bg-panel);
+      display: grid;
+      place-items: center;
+      box-shadow: 4px 4px 0px var(--border-light);
+      flex-shrink: 0;
+    }
+
+    .brand-stamp img {
+      width: 38px;
+      height: 38px;
+      object-fit: contain;
+      filter: grayscale(100%) contrast(1.4);
+    }
+
+    .brand-title {
+      font-family: var(--font-pixel);
+      font-size: clamp(1.15rem, 2vw, 1.5rem);
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--text-white);
+      line-height: 1.2;
+    }
+
+    html[lang="fa"] .brand-title,
+    html[lang="fa"] .font-pixel {
+      font-family: var(--font-fa);
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+
+    .brand-sub {
+      font-size: 0.75rem;
+      color: var(--text-gray);
+      margin-top: 0.3rem;
+    }
+
+    /* "NOW SERVING" Digital Ticket Counter Box */
+    .serving-counter-box {
+      grid-column: span 4;
+      padding: 1.25rem 1.5rem;
+      border-right: 2px solid var(--border-white);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-panel);
+    }
+
+    html[dir="rtl"] .serving-counter-box {
+      border-right: none;
+      border-left: 2px solid var(--border-white);
+    }
+
+    .serving-label {
+      font-family: var(--font-pixel);
+      font-size: 0.72rem;
+      color: var(--text-gray);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .live-dot {
+      width: 10px;
+      height: 10px;
+      background: var(--text-white);
+      display: inline-block;
+      animation: blink 1s steps(2, start) infinite;
+    }
+
+    .serving-number {
+      font-family: var(--font-arcade);
+      font-size: clamp(1.4rem, 2.5vw, 2rem);
+      color: var(--text-white);
+      background: var(--bg-black);
+      border: 2px solid var(--border-light);
+      padding: 0.4rem 0.85rem;
+      box-shadow: inset 2px 2px 0px #000;
+    }
+
+    /* Utility & Language Switcher Block */
+    .utility-block {
+      grid-column: span 3;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0.6rem;
+      background: var(--bg-black);
+    }
+
+    .action-btn {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      font-family: var(--font-pixel);
+      font-size: 0.75rem;
+      background: var(--bg-panel);
+      color: var(--text-white);
+      border: 2px solid var(--border-white);
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: 0.12s steps(2);
+      box-shadow: 3px 3px 0px var(--border-light);
+    }
+
+    .action-btn:hover {
+      background: var(--text-white);
+      color: var(--bg-black);
+      transform: translate(-1px, -1px);
+      box-shadow: 4px 4px 0px var(--border-light);
+    }
+
+    .action-btn.secondary-btn {
+      background: var(--bg-black);
+      color: var(--text-light);
+      border-color: var(--border-light);
+      box-shadow: none;
+    }
+
+    .action-btn.secondary-btn:hover {
+      background: var(--bg-gray-mid);
+      color: var(--text-white);
+      border-color: var(--border-white);
+    }
+
+    /* Menu Category Tabs ("Now Serving" Order Board Navigation) */
+    .menu-board-nav {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      border-bottom: 2px solid var(--border-white);
+      background: var(--bg-panel);
+    }
+
+    .menu-tab {
+      padding: 1rem 0.75rem;
+      background: var(--bg-dark);
+      color: var(--text-light);
+      border: none;
+      border-right: 1px solid var(--border-dim);
+      font-family: var(--font-pixel);
+      font-size: 0.82rem;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.3rem;
+      transition: all 0.12s steps(2);
+      text-align: start;
+      position: relative;
+    }
+
+    html[dir="rtl"] .menu-tab {
+      border-right: none;
+      border-left: 1px solid var(--border-dim);
+    }
+
+    .menu-tab:last-child {
+      border-right: none;
+      border-left: none;
+    }
+
+    .tab-ticket-no {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--text-gray);
+      background: var(--bg-black);
+      padding: 0.1rem 0.4rem;
+      border: 1px solid var(--border-dim);
+    }
+
+    .menu-tab:hover {
+      background: var(--bg-gray-mid);
+      color: var(--text-white);
+    }
+
+    .menu-tab.active {
+      background: var(--text-white);
+      color: var(--bg-black);
+      font-weight: 700;
+    }
+
+    .menu-tab.active .tab-ticket-no {
+      background: var(--bg-black);
+      color: var(--text-white);
+      border-color: var(--bg-black);
+    }
+
+    /* Section Header Strip ("Now Serving" Menu Category Header) */
+    .category-Context-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 2rem;
+      border-bottom: 2px solid var(--border-white);
+      background: var(--bg-panel);
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .category-title-group {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .ticket-pill {
+      background: var(--text-white);
+      color: var(--bg-black);
+      font-family: var(--font-arcade);
+      font-size: 0.9rem;
+      padding: 0.45rem 0.75rem;
+      border: 2px solid var(--bg-black);
+      box-shadow: 3px 3px 0px var(--border-light);
+    }
+
+    .category-title {
+      font-family: var(--font-pixel);
+      font-size: clamp(1.2rem, 2.5vw, 1.75rem);
+      text-transform: uppercase;
+    }
+
+    .category-count {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--text-light);
+      background: var(--bg-black);
+      border: 1px solid var(--border-light);
+      padding: 0.35rem 0.75rem;
+    }
+
+    /* Home / Info View ("Now Serving" Featured Special + Receipt Spec Table) */
+    .special-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      border-bottom: 2px solid var(--border-white);
+    }
+
+    .special-main {
+      grid-column: span 8;
+      padding: 2.25rem;
+      border-right: 2px solid var(--border-white);
+      background: var(--bg-dark);
+    }
+
+    html[dir="rtl"] .special-main {
+      border-right: none;
+      border-left: 2px solid var(--border-white);
+    }
+
+    .section-tag {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      color: var(--bg-black);
+      background: var(--text-light);
+      padding: 0.2rem 0.65rem;
+      margin-bottom: 1.25rem;
+      font-weight: 700;
+    }
+
+    .hero-frame {
+      border: 2px solid var(--border-white);
+      background: var(--bg-black);
+      padding: 0.75rem;
+      box-shadow: 6px 6px 0px var(--border-light);
+      margin-bottom: 1.75rem;
+      position: relative;
+    }
+
+    .hero-frame-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-dim);
+      padding-bottom: 0.5rem;
+      margin-bottom: 0.75rem;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-gray);
+    }
+
+    .hero-banner {
+      width: 100%;
+      max-height: 390px;
+      object-fit: contain;
+      display: block;
+      background: #ffffff;
+      filter: grayscale(100%) contrast(1.18);
+      transition: filter 0.25s steps(4);
+    }
+
+    .hero-frame:hover .hero-banner {
+      filter: grayscale(0%) contrast(1);
+    }
+
+    .hero-headline {
+      font-family: var(--font-pixel);
+      font-size: clamp(1.15rem, 2.2vw, 1.65rem);
+      line-height: 1.45;
+      margin-bottom: 1rem;
+      color: var(--text-white);
+    }
+
+    .hero-bio {
+      color: var(--text-light);
+      font-size: 1rem;
+      background: var(--bg-panel);
+      border-left: 4px solid var(--text-white);
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.75rem;
+    }
+
+    html[dir="rtl"] .hero-bio {
+      border-left: none;
+      border-right: 4px solid var(--text-white);
+    }
+
+    /* Decorative Stickers Strip */
+    .sticker-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1.25rem;
+      padding: 1rem 1.25rem;
+      border: 2px dashed var(--border-light);
+      background: var(--bg-black);
+    }
+
+    .sticker-items {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .sticker-img {
+      height: 54px;
+      object-fit: contain;
+      filter: grayscale(100%) contrast(1.25);
+      transition: transform 0.2s steps(3), filter 0.2s;
+    }
+
+    .sticker-img:hover {
+      filter: grayscale(0%);
+      transform: scale(1.1);
+    }
+
+    /* Right Column: "Now Serving" Receipt / Order Specification Side Panel */
+    .receipt-sidebar {
+      grid-column: span 4;
+      padding: 2.25rem 1.75rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: var(--bg-panel);
+    }
+
+    .receipt-box {
+      border: 2px solid var(--border-white);
+      background: var(--bg-black);
+      padding: 1.5rem;
+      box-shadow: 5px 5px 0px var(--border-dim);
+    }
+
+    .receipt-header {
+      border-bottom: 2px dashed var(--border-light);
+      padding-bottom: 0.85rem;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .receipt-title {
+      font-family: var(--font-pixel);
+      font-size: 0.95rem;
+      color: var(--text-white);
+    }
+
+    .receipt-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.55rem 0;
+      border-bottom: 1px dotted var(--border-dim);
+      font-size: 0.78rem;
+    }
+
+    .receipt-row span:first-child {
+      color: var(--text-gray);
+    }
+
+    .receipt-row span:last-child {
+      color: var(--text-white);
+      font-weight: 700;
+    }
+
+    .receipt-stamp-area {
+      margin-top: 1.5rem;
+      padding: 1.25rem;
+      border: 2px solid var(--text-white);
+      text-align: center;
+      background: var(--bg-dark);
+    }
+
+    .receipt-stamp-area img {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+      margin-top: 0.65rem;
+      filter: grayscale(100%) contrast(1.3);
+    }
+
+    /* Quick Category Menu Index inside Home */
+    .quick-menu-bar {
+      grid-column: span 12;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border-top: 2px solid var(--border-white);
+      background: var(--bg-black);
+    }
+
+    .quick-card {
+      padding: 1.35rem 1.5rem;
+      border-right: 1px solid var(--border-dim);
+      cursor: pointer;
+      transition: 0.15s steps(3);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    html[dir="rtl"] .quick-card {
+      border-right: none;
+      border-left: 1px solid var(--border-dim);
+    }
+
+    .quick-card:hover {
+      background: var(--text-white);
+      color: var(--bg-black);
+    }
+
+    .quick-card-title {
+      font-family: var(--font-pixel);
+      font-size: 0.85rem;
+    }
+
+    .quick-card-qty {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      padding: 0.2rem 0.5rem;
+      border: 1px solid currentColor;
+    }
+
+    /* =========================================================
+       3. PORTFOLIO GALLERY GRID ("NOW SERVING" MENU ITEM CARDS)
+       ========================================================= */
+    .portfolio-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 2rem;
+      padding: 2.5rem 2rem;
+      background: var(--bg-dark);
+    }
+
+    .portfolio-card {
+      background: var(--bg-black);
+      border: 2px solid var(--border-light);
+      display: flex;
+      flex-direction: column;
+      transition: all 0.15s steps(3);
+      position: relative;
+    }
+
+    .portfolio-card:hover {
+      border-color: var(--border-white);
+      box-shadow: 6px 6px 0px var(--text-white);
+      transform: translate(-3px, -3px);
+    }
+
+    .card-ticket-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.6rem 0.9rem;
+      background: var(--bg-panel);
+      border-bottom: 2px solid var(--border-light);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+    }
+
+    .portfolio-card:hover .card-ticket-top {
+      background: var(--text-white);
+      color: var(--bg-black);
+      border-bottom-color: var(--bg-black);
+    }
+
+    .ticket-id {
+      font-family: var(--font-pixel);
+      font-weight: 700;
+    }
+
+    .ticket-spec {
+      opacity: 0.8;
+    }
+
+    .card-img-wrap {
+      padding: 0.85rem;
+      background: var(--bg-black);
+      flex-grow: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .portfolio-img {
+      width: 100%;
+      height: 260px;
+      object-fit: cover;
+      border: 1px solid var(--border-dim);
+      background: #121215;
+      filter: grayscale(100%) contrast(1.18);
+      transition: filter 0.25s steps(4);
+    }
+
+    .portfolio-card:hover .portfolio-img {
+      filter: grayscale(0%) contrast(1);
+    }
+
+    .card-ticket-bottom {
+      padding: 0.55rem 0.9rem;
+      border-top: 1px dashed var(--border-dim);
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.68rem;
+      color: var(--text-gray);
+      background: #08080a;
+    }
+
+    .empty-notice {
+      padding: 5rem 2rem;
+      text-align: center;
+      color: var(--text-light);
+      font-family: var(--font-pixel);
+      font-size: 0.95rem;
+      border: 2px dashed var(--border-light);
+      margin: 3rem 2rem;
+      background: var(--bg-black);
+      box-shadow: 6px 6px 0px var(--bg-gray-mid);
+    }
+
+    /* Footer */
+    .site-footer {
+      margin-top: auto;
+      padding: 1.5rem 2rem;
+      border-top: 2px solid var(--border-white);
+      background: var(--bg-black);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--text-gray);
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .footer-link {
+      color: var(--text-white);
+      text-decoration: none;
+      font-family: var(--font-pixel);
+      border: 1px solid var(--border-light);
+      padding: 0.3rem 0.7rem;
+      transition: 0.15s;
+    }
+
+    .footer-link:hover {
+      background: var(--text-white);
+      color: var(--bg-black);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 960px) {
+      .brand-block { grid-column: span 12; border-right: none; border-left: none; border-bottom: 2px solid var(--border-white); }
+      .serving-counter-box { grid-column: span 7; }
+      .utility-block { grid-column: span 5; }
+      .menu-board-nav { grid-template-columns: repeat(3, 1fr); }
+      .menu-tab { border-bottom: 1px solid var(--border-dim); }
+      .special-main, .receipt-sidebar { grid-column: span 12; border-right: none; border-left: none; }
+      .special-main { border-bottom: 2px solid var(--border-white); }
+      .quick-menu-bar { grid-template-columns: repeat(2, 1fr); }
+      .quick-card { border-bottom: 1px solid var(--border-dim); }
+    }
+
+    @media (max-width: 600px) {
+      .serving-counter-box, .utility-block { grid-column: span 12; border-right: none; border-left: none; }
+      .serving-counter-box { border-bottom: 2px solid var(--border-white); }
+      .menu-board-nav { grid-template-columns: repeat(2, 1fr); }
+      .quick-menu-bar { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body class="scanlines">
+
+  <!-- =========================================================
+       RETRO ARCADE SPLASH SCREEN ("BYE BYE GHOL")
+       ========================================================= -->
+  <div id="intro-splash">
+    <canvas id="starfield"></canvas>
+
+    <div class="splash-top">
+      <div class="series-badge">PORTFOLIO SERIES</div>
+    </div>
+
+    <div class="splash-center">
+      <div class="monolith-title-wrap">
+        <div class="monolith-title">BYE BYE<br>GHOL<span class="tm-mark">TM</span></div>
+      </div>
+      <div class="alpha-sub">ALPHA VERSION</div>
+      <div class="tagline-sub">SHAHRIYAR MOMENY ARCHIVE!</div>
+
+      <div class="arcade-menu">
+        <button class="arcade-btn primary" onclick="enterSite()">PLAY</button>
+        <a href="https://store.steampowered.com/" class="arcade-btn secondary">EXIT</a>
+      </div>
+    </div>
+
+    <div class="splash-footer">
+      Copyright © SHAHRIYAR MOMENY, INC. 2026
+    </div>
+  </div>
+
+  <!-- =========================================================
+       MAIN "NOW SERVING" PORTFOLIO APPLICATION
+       ========================================================= -->
+  <div class="now-serving-shell">
+
+    <!-- Top Marquee Ticker -->
+    <div class="ticker-wrap">
+      <div class="ticker-move">
+        <span>★ NOW SERVING: SHAHRIYAR MOMENY PORTFOLIO ★ PIXEL-ART & MONOCHROME EDITION ★ GRAPHIC DESIGN • ILLUSTRATION • CONCEPT ART • ANIMATION & 2D GAME DEV ★ ISFAHAN, IR ★ PRESS [PLAY] TO BROWSE ORDERS ★&nbsp;&nbsp;&nbsp;&nbsp;</span>
+        <span>★ NOW SERVING: SHAHRIYAR MOMENY PORTFOLIO ★ PIXEL-ART & MONOCHROME EDITION ★ GRAPHIC DESIGN • ILLUSTRATION • CONCEPT ART • ANIMATION & 2D GAME DEV ★ ISFAHAN, IR ★ PRESS [PLAY] TO BROWSE ORDERS ★&nbsp;&nbsp;&nbsp;&nbsp;</span>
+      </div>
+    </div>
+
+    <!-- Header / Ticket Counter -->
+    <header class="counter-header">
+      <div class="brand-block">
+        <a href="#home" onclick="switchSection('home'); return false;" style="display:flex; align-items:center; gap:1.15rem; text-decoration:none; color:inherit;">
+          <div class="brand-stamp">
+            <img src="ت-01.webp" alt="Sun Emblem" />
+          </div>
+          <div>
+            <div class="brand-title" data-i18n="brandName">SHAHRIYAR MOMENY</div>
+            <div class="brand-sub" data-i18n="brandRole">Graphic Designer • Illustrator • Concept Artist • Animation & Game Dev</div>
+          </div>
+        </a>
+      </div>
+
+      <div class="serving-counter-box checker-pattern">
+        <div>
+          <div class="serving-label">
+            <span class="live-dot"></span>
+            <span data-i18n="nowServingLabel">NOW SERVING</span>
+          </div>
+          <div style="font-size: 0.72rem; color: var(--text-light); margin-top: 0.25rem;" id="serving-cat-name">
+            00 // INFO DOSSIER
+          </div>
+        </div>
+        <div class="serving-number" id="serving-ticket-num">#00</div>
+      </div>
+
+      <div class="utility-block">
+        <button class="action-btn" onclick="toggleLanguage()" data-i18n="langBtn">FA / فارسی</button>
+        <button class="action-btn secondary-btn" onclick="reopenSplash()" data-i18n="arcadeBtn">[ ARCADE SCREEN ]</button>
+      </div>
+    </header>
+
+    <!-- "Now Serving" Menu Board Tabs -->
+    <nav class="menu-board-nav">
+      <button class="menu-tab active" data-target="home" data-ticket="#00" onclick="switchSection('home')">
+        <span class="tab-ticket-no">TICKET #00</span>
+        <span data-i18n="navHome">00. Info</span>
+      </button>
+      <button class="menu-tab" data-target="blog" data-ticket="#01" onclick="switchSection('blog')">
+        <span class="tab-ticket-no">TICKET #01</span>
+        <span data-i18n="navBlog">01. Blog</span>
+      </button>
+      <button class="menu-tab" data-target="animation" data-ticket="#02" onclick="switchSection('animation')">
+        <span class="tab-ticket-no">TICKET #02</span>
+        <span data-i18n="navAnim">02. Animation</span>
+      </button>
+      <button class="menu-tab" data-target="graphic" data-ticket="#03" onclick="switchSection('graphic')">
+        <span class="tab-ticket-no">TICKET #03</span>
+        <span data-i18n="navGraphic">03. Graphic</span>
+      </button>
+      <button class="menu-tab" data-target="illustration" data-ticket="#04" onclick="switchSection('illustration')">
+        <span class="tab-ticket-no">TICKET #04</span>
+        <span data-i18n="navIllus">04. Illustration</span>
+      </button>
+      <button class="menu-tab" data-target="game" data-ticket="#05" onclick="switchSection('game')">
+        <span class="tab-ticket-no">TICKET #05</span>
+        <span data-i18n="navGame">05. Game</span>
+      </button>
+    </nav>
+
+    <!-- =========================================================
+         VIEW 00: HOME (INFO & ARCHITECTURAL DOSSIER)
+         ========================================================= -->
+    <main id="view-home" class="page-view">
+      <div class="special-grid">
+        <div class="special-main">
+          <span class="section-tag" data-i18n="heroLabel">// 00. ARCHITECTURAL DOSSIER & BANNER</span>
+
+          <div class="hero-frame">
+            <div class="hero-frame-bar">
+              <span>FEATURED ORDER // PLATE_00</span>
+              <span>1-BIT MONOCHROME RENDER</span>
+            </div>
+            <img src="Untitled-1.webp" alt="Shahriyar Momeny Hero Banner" class="hero-banner" />
+          </div>
+
+          <h1 class="hero-headline" data-i18n="heroTitle">
+            GRAPHIC DESIGNER • ILLUSTRATOR • CONCEPT ARTIST • ANIMATION & GAME DEV
+          </h1>
+
+          <p class="hero-bio" data-i18n="heroDesc">
+            سلام من شهریار هستم این هم دفترچه کارهای من در چندوقت گذشته سعی میکنم بیشتر کارهام رو به اشتراک بزارم
+          </p>
+
+          <!-- Decorative Elements -->
+          <div class="sticker-strip">
+            <div class="sticker-items">
+              <img src="هه-01.webp" alt="Fire Flower Decor" class="sticker-img" />
+              <img src="زطزطزطزطزطزطزط-01.webp" alt="Birds Decor" class="sticker-img" />
+              <img src="ت-01.webp" alt="Sun Decor" class="sticker-img" />
+            </div>
+            <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-gray);">
+              STAMPED & VERIFIED // 2026
+            </div>
+          </div>
+        </div>
+
+        <!-- Receipt Style Specification Sidebar -->
+        <aside class="receipt-sidebar dither-pattern">
+          <div class="receipt-box">
+            <div class="receipt-header">
+              <div class="receipt-title" data-i18n="receiptHeader">ORDER SPECIFICATION</div>
+              <div style="font-size: 0.68rem; color: var(--text-gray); margin-top: 0.2rem;">TICKET #00 — COUNTER A</div>
+            </div>
+            <div class="receipt-row">
+              <span>OPERATOR</span>
+              <span>SHAHRIYAR MOMENY</span>
+            </div>
+            <div class="receipt-row">
+              <span>DISCIPLINE</span>
+              <span>VISUAL ARTS & GAMES</span>
+            </div>
+            <div class="receipt-row">
+              <span>AESTHETIC</span>
+              <span>PIXEL / MONOCHROME</span>
+            </div>
+            <div class="receipt-row">
+              <span>ANIMATION REEL</span>
+              <span>10 PLATES</span>
+            </div>
+            <div class="receipt-row">
+              <span>GRAPHIC POSTERS</span>
+              <span>05 PLATES</span>
+            </div>
+            <div class="receipt-row">
+              <span>ILLUSTRATIONS</span>
+              <span>15 PLATES</span>
+            </div>
+            <div class="receipt-row">
+              <span>GAME DEV ASSETS</span>
+              <span>09 PLATES</span>
+            </div>
+            <div class="receipt-row" style="border-bottom: none; padding-top: 0.85rem;">
+              <span>STATUS</span>
+              <span style="background: var(--text-white); color: var(--bg-black); padding: 0 0.4rem;">READY TO SERVE</span>
+            </div>
+          </div>
+
+          <div class="receipt-stamp-area">
+            <div class="font-pixel" style="font-size: 0.82rem;">[ PORTFOLIO ARCHIVE ]</div>
+            <img src="ت-01.webp" alt="Sun Stamp" />
+            <div style="font-size: 0.68rem; color: var(--text-gray); margin-top: 0.5rem;">
+              GITHUB PAGES EDITION // 2026
+            </div>
+          </div>
+        </aside>
+
+        <!-- Quick Jump Menu Bar -->
+        <div class="quick-menu-bar">
+          <div class="quick-card" onclick="switchSection('animation')">
+            <span class="quick-card-title" data-i18n="navAnim">02. Animation</span>
+            <span class="quick-card-qty">10 ITEMS →</span>
+          </div>
+          <div class="quick-card" onclick="switchSection('graphic')">
+            <span class="quick-card-title" data-i18n="navGraphic">03. Graphic</span>
+            <span class="quick-card-qty">05 ITEMS →</span>
+          </div>
+          <div class="quick-card" onclick="switchSection('illustration')">
+            <span class="quick-card-title" data-i18n="navIllus">04. Illustration</span>
+            <span class="quick-card-qty">15 ITEMS →</span>
+          </div>
+          <div class="quick-card" onclick="switchSection('game')">
+            <span class="quick-card-title" data-i18n="navGame">05. Game</span>
+            <span class="quick-card-qty">09 ITEMS →</span>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- =========================================================
+         VIEW 01: BLOG
+         ========================================================= -->
+    <section id="view-blog" class="page-view" style="display: none;">
+      <div class="category-Context-bar dither-pattern">
+        <div class="category-title-group">
+          <span class="ticket-pill">#01</span>
+          <h2 class="category-title" data-i18n="blogHeader">01 // JOURNAL & WORK LOGS</h2>
+        </div>
+        <span class="category-count">STATUS: IN PREPARATION</span>
+      </div>
+      <div class="empty-notice" data-i18n="emptyNotice">
+        [ بخش وبلاگ در حال آماده‌سازی است. به‌زودی مقالات و یادداشت‌ها اضافه خواهند شد. ]
+      </div>
+    </section>
+
+    <!-- =========================================================
+         VIEW 02: ANIMATION (10 WORKS)
+         ========================================================= -->
+    <section id="view-animation" class="page-view" style="display: none;">
+      <div class="category-Context-bar dither-pattern">
+        <div class="category-title-group">
+          <span class="ticket-pill">#02</span>
+          <h2 class="category-title">02 // ANIMATION & VIDEO GAME REEL</h2>
+        </div>
+        <span class="category-count">SERVING 10 PLATES</span>
+      </div>
+      <div class="portfolio-grid">
+        <div class="portfolio-card">
+          <div class="card-ticket-top"><span class="ticket-id">ORDER #A01</span><span class="ticket-spec">ANIMATION</span></div>
+          <div class="card-img-wrap"><img src="عع-01.jpg" alt="Anim 1" class="portfolio-img" /></div>
+          <div class="card-ticket-bottom"><span>PLATE_01</span><span>MONOCHROME / HOVER COLOR</span></div>
+        </div>
+        <div class="portfolio-card">
+          <div class="card-ticket-top"><span class="ticket-id">ORDER #A02</span><span class="ticket-spec">ANIMATION</span></div>
+          <div class="card-img-wrap"><img src="اتغق-01.webp" alt="Anim 2" class="portfolio-img" /></div>
+          <div class="card-ticket-bottom"><span>PLATE_02</span><span>MONOCHROME / HOVER COLOR</span></div>
+        </div>
+        <div class="portfolio-card">
+          <div class="card-ticket-top"><span class="ticket-id">ORDER #A03</span><span class="ticket-spec">ANIMATION</span></div>
+          <div class="card-img-wrap"><img src="حححح-01.webp" alt="Anim 3" class="portfolio-img" /></div>
+          <div class="card-ticket-bottom"><span>PLATE_03</span><span>MONOCHROME / HOVER COLOR</span></div>
+        </div>
+        <div class="portfolio-card">
+          <div class="card-ticket-top"><span class="ticket-id">ORDER #A04</span><span class="ticket-spec">ANIMATION</span></div>
+          <div class="card-img-wrap"><img src="زرزرزر-01.jpg" alt="Anim 4" class="portfolio-img" /></div>
+          <div class="card-ticket-bottom"><span>PLATE_04</span><span>MONOCHROME / HOVER COLOR</span></div>
+        </div>
+        <div class="portfolio-card">
+          <div class="card-ticket-top"><span class="ticket-id">ORDER #A05</span><span class="ticket-spec">ANIMATION</span></div>
+          <div class="card-img-wrap"><img src="ززز-01.jpg" alt="Anim 5" class="portfolio-img" /></div>
+          <div class="card-ticket-bottom"><span>PLATE_05</span><span>MONOCHROME / HOVER COLOR</span></div>
+        </div>
+        <div class="portfolio-card">
+          <div class="card-ticket-top"><span class="ticket-id">ORDER #A06</span><span class="ticket-spec">ANIMATION</span></div>
+          <div class="card-img-wrap"><img src="ززززطظ-01.webp" alt="Anim 6" class="portfolio-img" /></div>
+          <div class="card-ticket-bottom"><span>PLATE_06</span><span>MONOCHROME / HOVER COLOR</span></div>
+        </div>
+        <div class="portfolio-card">
+          <div class="card-ticket-top"><span class="ticket-id">ORDER #A07</span><span class="ticket-spec">ANIMATION</span></div>
+          <div class="card-img-wrap"><img src="زطزطزرذ-01.webp" alt="Anim 7" class="portfolio-img" /></div>
+          <div class="card-ticket-bottom"><span>PLATE_07</span><span>MONOCHROME / HOVER COLOR</span></div>
+        </div>
+        <div class="portfolio-card">
+          <div class="card-ticket-top"><span class="ticket-id">ORDER #A08</span><span class="ticket-spec">ANIMATION</span></div>
+          <div class="card-img-wrap"><img src="طزطزطزط-01.jpg" alt="Anim 8" class="portfolio-img" /></div>
+          <div class="card-ticket-bottom"><span>PLATE_08</span><span>MONOCHROME / HOVER COLOR</span></div>
+        </div>
+        <div class="portfolio-card">
+          <div class="card-ticket-top"><span class="ticket-id">ORDER #A09</span><span class="ticket-spec">ANIMATION</span></div>
+          <div class="card-img-wrap"><img src="ظظط-01.jpg" alt="Anim 9" class="portfolio-img" /></div>
+          <div class="card-ticket-bottom"><span>PLATE_09</span><span>MONOCHROME / HOVER COLOR</span></div>
+        </div>
+        <div class="portfolio-card">
+          <div class="card-ticket-top"><span class="ticket-id">ORDER #A10</span><span class="ticket-spec">ANIMATION</span></div>
+          <div class="card-img-wrap"><img src="ززززررز-01.webp" alt="Anim 10" class="portfolio-img" /></div>
+          <div class="card-ticket-bottom"><span>PLATE_10</span><span>MONOCHROME / HOVER COLOR</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         VIEW 03: GRAPHIC (5 WORKS)
+         ========================================================= -->
+    <section id="view-graphic" class="page-view" style="display: none;">
+      <div class="category-Context-bar dither-pattern">
+        <div class="category-title-group">
+          <span class="ticket-pill">#03</span>
+          <h2 class="category-title">03 // GRAPHIC DESIGN & POSTERS</h2>
+        </div>
+        <span class="category-count">SERVING 05 PLATES</span>
+      </div>
+      <div class="portfolio-grid">
+        <div class="portfolio-card">
+          <div class="card-ticket-top"><span class="ticket-id">ORDER #G01</span><span class="ticket-spec">GRAPHIC</span></div>
+          <div class="card-img-wrap"><img src="ئائار-01.jpg" alt="Graphic 1" class="portfolio-img" /></div>
+          <div class="card-ticket-bottom"><span>POSTER_01</span><span>MONOCHROME / HOVER COLOR</span></div>
+        </div>
+        <div class="portfolio-card">
+          <div class="card-ticket-top"><span class="ticket-id">ORDER #G02</span><span class="ticket-spec">GRAPHIC</span></div>
+          <div class="card-img-wrap"><img src="مممممم-01.webp" alt="Graphic 2" class="portfolio-img" /></div>
+          <div class="card-ticket-bottom"><span>POSTER_02</span><span>MONOCHROME / HOVER COLOR</span></div>
+        </div>
+        <div class="portfolio-card">
+          <div class="card-ticket-top"><span class="ticket-id">ORDER #G03</span><span class="ticket-spec">GRAPHIC</span></div>
+          <div class="card-img-wrap"><img src="هحخ-01.jpg" alt="Graphic 3" class="portfolio-img" /></div>
+          <div class="card-ticket-bottom"><span>POSTER_03</span><span>MONOCHROME / HOVER COLOR</span></div>
+        </div>
+        <div class="portfolio-card">
+          <div class="card-ticket-top"><span class="ticket-id">ORDER #G04</span><span class="ticket-spec">GRAPHIC</span></div>
+          <div class="card-img-wrap"><img src="ئائا-01.jpg" alt="Graphic 4" class="portfolio-img" /></div>
+          <div class="card-ticket-bottom"><span>POSTER_04</span><span>MONOCHROME / HOVER COLOR</span></div>
+        </div>
+        <div class="portfolio-card">
+          <div class="card-ticket-top"><span class="ticket-id">ORDER #G05</span><span class="ticket-spec">GRAPHIC</span></div>
+          <div class="card-img-wrap"><img src="زطزطزطزط-01.jpg" alt="Graphic 5" class="portfolio-img" /></div>
+          <div class="card-ticket-bottom"><span>POSTER_05</span><span>MONOCHROME / HOVER COLOR</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         VIEW 04: ILLUSTRATION (15 WORKS)
+         ========================================================= -->
+    <section id="view-illustration" class="page-view" style="display: none;">
+      <div class="category-Context-bar dither-pattern">
+        <div class="category-title-group">
+          <span class="ticket-pill">#04</span>
+          <h2 class="category-title">04 // ILLUSTRATION & CONCEPT ART</h2>
+        </div>
+        <span class="category-count">SERVING 15 PLATES</span>
+      </div>
+      <div class="portfolio-grid">
+        <div class="portfolio-card">
+          <div class="card-ticket-top"><span class="ticket-id">ORDER #I01</span><span class="ticket-spec">ILLUSTRATION</span></div>
+          <div class="card-img-wrap"><img src="ذببل-01.jpg" alt="Illus 1" class="portfolio-img" /></div>
+          <div class="card-ticket-bottom"><span>CONCEPT_01</span><span>MONOCHROME / HOVER COLOR</span></div>
+        </div>
+        <div class="portfolio-card">
+          <div class="card-ticket-top"><span class="ticket-id">ORDER #I02</span><span class="ticket-spec">ILLUSTRATION</span></div>
+          <div class="card-img-wrap"><img src="ذذلل-01.webp" alt="Illus 2" class="portfolio-img" /></div>
+          <div class="card-ticket-bottom"><span>CONCEPT_02</span><span>MONOCHROME / HOVER COLOR</span></div>
+        </div>
+        <div class="portfolio-card">
+          <div class="card-ticket-top"><span class="ticket-id">ORDER #I03</span><span class="ticket-spec">ILLUSTRATION</span></div>
+          <div class="card-img-wrap"><img src="ذربلالذ-01.jpg" alt="Illus 3" class="portfolio-img" /></div>
+          <div class="card-ticket-bottom"><span>CONCEPT_03</span><span>MONOCHROME / HOVER COLOR</span></div>
+        </div>
+        <div class="portfolio-card">
+          <div class="card-ticket-top"><span class="ticket-id">ORDER #I04</span><span class="ticket-spec">ILLUSTRATION</span></div>
+          <div class="card-img-wrap"><img src="باابب-01.webp" alt="Illus 4" class="portfolio-img" /></div>
+          <div class="card-ticket-bottom"><span>CONCEPT_04</span><span>MONOCHROME / HOVER COLOR</span></div>
+        </div>
+        <div class="portfolio-card">
+          <div class="card-ticket-top"><span class="ticket-id">ORDER #I05</span><span class="ticket-spec">ILLUSTRATION</span></div>
+          <div class="card-img-wrap"><img src="دا-01.webp" alt="Illus 5" class="portfolio-img" /></div>
+          <div class="card-ticket-bottom"><span>CONCEPT_05</span><span>MONOCHROME / HOVER COLOR</span></div>
+        </div>
+        <div class="portfolio-card">
+          <div class="card-ticket-top"><span class="ticket-id">ORDER #I06</span><span class="ticket-spec">ILLUSTRATION</span></div>
+          <div class="card-img-wrap"><img src="ذلالا-01.jpg" alt="Illus 6" class="portfolio-img" /></div>
+          <div class="card-ticket-bottom"><span>CONCEPT_06</span><span>MONOCHROME / HOVER COLOR</span></div>
+        </div>
+        <div class="portfolio-card">
+          <div class="card-ticket-top"><span class="ticket-id">ORDER #I07</span><span class="ticket-spec">ILLUSTRATION</span></div>
+          <div class="card-img-wrap"><img src="رربب-01.jpg" alt="Illus 7" class="portfolio-img" /></div>
+          <div class="card-ticket-bottom"><span>CONCEPT_07</span><span>MONOCHROME / HOVER COLOR</span></div>
+        </div>
+        <div class="portfolio-card">
+          <div class="card-ticket-top"><span class="ticket-id">ORDER #I08</span><span class="ticket-spec">ILLUSTRATION</span></div>
+          <div class="card-img-wrap"><img src="ررز-01.webp" alt="Illus 8" class="portfolio-img" /></div>
+          <div class="card-ticket-bottom"><span>CONCEPT_08</span><span>MONOCHROME / HOVER COLOR</span></div>
+        </div>
+        <div class="portfolio-card">
+          <div class="card-ticket-top"><span class="ticket-id">ORDER #I09</span><span class="ticket-spec">ILLUSTRATION</span></div>
+          <div class="card-img-wrap"><img src="رز-01.webp" alt="Illus 9" class="portfolio-img" /></div>
+          <div class="card-ticket-bottom"><span>CONCEPT_09</span><span>MONOCHROME / HOVER COLOR</span></div>
+        </div>
+        <div class="portfolio-card">
+          <div class="card-ticket-top"><span class="ticket-id">ORDER #I10</span><span class="ticket-spec">ILLUSTRATION</span></div>
+          <div class="card-img-wrap"><img src="ززرزرزر-01.webp" alt="Illus 10" class="portfolio-img" /></div>
+          <div class="card-ticket-bottom"><span>CONCEPT_10</span><span>MONOCHROME / HOVER COLOR</span></div>
+        </div>
+        <div class="portfolio-card">
+          <div class="card-ticket-top"><span class="ticket-id">ORDER #I11</span><span class="ticket-spec">ILLUSTRATION</span></div>
+          <div class="card-img-wrap"><img src="لتتاتا-01.webp" alt="Illus 11" class="portfolio-img" /></div>
+          <div class="card-ticket-bottom"><span>CONCEPT_11</span><span>MONOCHROME / HOVER COLOR</span></div>
+        </div>
+        <div class="portfolio-card">
+          <div class="card-ticket-top"><span class="ticket-id">ORDER #I12</span><span class="ticket-spec">ILLUSTRATION</span></div>
+          <div class="card-img-wrap"><img src="نعع-01.webp" alt="Illus 12" class="portfolio-img" /></div>
+          <div class="card-ticket-bottom"><span>CONCEPT_12</span><span>MONOCHROME / HOVER COLOR</span></div>
+        </div>
+        <div class="portfolio-card">
+          <div class="card-ticket-top"><span class="ticket-id">ORDER #I13</span><span class="ticket-spec">ILLUSTRATION</span></div>
+          <div class="card-img-wrap"><img src="هخهخه-01.jpg" alt="Illus 13" class="portfolio-img" /></div>
+          <div class="card-ticket-bottom"><span>CONCEPT_13</span><span>MONOCHROME / HOVER COLOR</span></div>
+        </div>
+        <div class="portfolio-card">
+          <div class="card-ticket-top"><span class="ticket-id">ORDER #I14</span><span class="ticket-spec">ILLUSTRATION</span></div>
+          <div class="card-img-wrap"><img src="زززظ-01.jpg" alt="Illus 14" class="portfolio-img" /></div>
+          <div class="card-ticket-bottom"><span>CONCEPT_14</span><span>MONOCHROME / HOVER COLOR</span></div>
+        </div>
+        <div class="portfolio-card">
+          <div class="card-ticket-top"><span class="ticket-id">ORDER #I15</span><span class="ticket-spec">ILLUSTRATION</span></div>
+          <div class="card-img-wrap"><img src="زططط-01.jpg" alt="Illus 15" class="portfolio-img" /></div>
+          <div class="card-ticket-bottom"><span>CONCEPT_15</span><span>MONOCHROME / HOVER COLOR</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         VIEW 05: GAME (9 WORKS)
+         ========================================================= -->
+    <section id="view-game" class="page-view" style="display: none;">
+      <div class="category-Context-bar dither-pattern">
+        <div class="category-title-group">
+          <span class="ticket-pill">#05</span>
+          <h2 class="category-title">05 // 2D GAME DEVELOPMENT & PIXEL ART</h2>
+        </div>
+        <span class="category-count">SERVING 09 PLATES</span>
+      </div>
+      <div class="portfolio-grid">
+        <div class="portfolio-card">
+          <div class="card-ticket-top"><span class="ticket-id">ORDER #GM01</span><span class="ticket-spec">GAME DEV</span></div>
+          <div class="card-img-wrap"><img src="ظظظظظظ-01.jpg" alt="Game 1" class="portfolio-img" /></div>
+          <div class="card-ticket-bottom"><span>ASSET_01</span><span>MONOCHROME / HOVER COLOR</span></div>
+        </div>
+        <div class="portfolio-card">
+          <div class="card-ticket-top"><span class="ticket-id">ORDER #GM02</span><span class="ticket-spec">GAME DEV</span></div>
+          <div class="card-img-wrap"><img src="اتت-01.webp" alt="Game 2" class="portfolio-img" /></div>
+          <div class="card-ticket-bottom"><span>ASSET_02</span><span>MONOCHROME / HOVER COLOR</span></div>
+        </div>
+        <div class="portfolio-card">
+          <div class="card-ticket-top"><span class="ticket-id">ORDER #GM03</span><span class="ticket-spec">GAME DEV</span></div>
+          <div class="card-img-wrap"><img src="خخ-01.webp" alt="Game 3" class="portfolio-img" /></div>
+          <div class="card-ticket-bottom"><span>ASSET_03</span><span>MONOCHROME / HOVER COLOR</span></div>
+        </div>
+        <div class="portfolio-card">
+          <div class="card-ticket-top"><span class="ticket-id">ORDER #GM04</span><span class="ticket-spec">GAME DEV</span></div>
+          <div class="card-img-wrap"><img src="طط-01.webp" alt="Game 4" class="portfolio-img" /></div>
+          <div class="card-ticket-bottom"><span>ASSET_04</span><span>MONOCHROME / HOVER COLOR</span></div>
+        </div>
+        <div class="portfolio-card">
+          <div class="card-ticket-top"><span class="ticket-id">ORDER #GM05</span><span class="ticket-spec">GAME DEV</span></div>
+          <div class="card-img-wrap"><img src="طططز-01.webp" alt="Game 5" class="portfolio-img" /></div>
+          <div class="card-ticket-bottom"><span>ASSET_05</span><span>MONOCHROME / HOVER COLOR</span></div>
+        </div>
+        <div class="portfolio-card">
+          <div class="card-ticket-top"><span class="ticket-id">ORDER #GM06</span><span class="ticket-spec">GAME DEV</span></div>
+          <div class="card-img-wrap"><img src="ئئد-01.webp" alt="Game 6" class="portfolio-img" /></div>
+          <div class="card-ticket-bottom"><span>ASSET_06</span><span>MONOCHROME / HOVER COLOR</span></div>
+        </div>
+        <div class="portfolio-card">
+          <div class="card-ticket-top"><span class="ticket-id">ORDER #GM07</span><span class="ticket-spec">GAME DEV</span></div>
+          <div class="card-img-wrap"><img src="ظظظظظظظظظ-01.webp" alt="Game 7" class="portfolio-img" /></div>
+          <div class="card-ticket-bottom"><span>ASSET_07</span><span>MONOCHROME / HOVER COLOR</span></div>
+        </div>
+        <div class="portfolio-card">
+          <div class="card-ticket-top"><span class="ticket-id">ORDER #GM08</span><span class="ticket-spec">GAME DEV</span></div>
+          <div class="card-img-wrap"><img src="فغغ-01.webp" alt="Game 8" class="portfolio-img" /></div>
+          <div class="card-ticket-bottom"><span>ASSET_08</span><span>MONOCHROME / HOVER COLOR</span></div>
+        </div>
+        <div class="portfolio-card">
+          <div class="card-ticket-top"><span class="ticket-id">ORDER #GM09</span><span class="ticket-spec">GAME DEV</span></div>
+          <div class="card-img-wrap"><img src="ممن-01.webp" alt="Game 9" class="portfolio-img" /></div>
+          <div class="card-ticket-bottom"><span>ASSET_09</span><span>MONOCHROME / HOVER COLOR</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+      <div data-i18n="footerCopy">© 2026 SHAHRIYAR MOMENY — MONOCHROME PIXEL ARCHITECTURE</div>
+      <div class="footer-links">
+        <a href="https://github.com/momenyshahriyar-svg" target="_blank" class="footer-link">[GITHUB]</a>
+        <a href="https://store.steampowered.com/" target="_blank" class="footer-link">[STEAM]</a>
+      </div>
+    </footer>
+
+  </div>
+
+  <script>
+    /* =========================================================
+       1. RETRO PIXEL STARFIELD CANVAS FOR SPLASH SCREEN
+       ========================================================= */
+    const canvas = document.getElementById('starfield');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+
+    function resizeStarfield() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      initStars();
+    }
+
+    function initStars() {
+      stars = [];
+      const count = Math.floor((canvas.width * canvas.height) / 9000);
+      for (let i = 0; i < count; i++) {
+        stars.push({
+          x: Math.floor(Math.random() * canvas.width),
+          y: Math.floor(Math.random() * canvas.height),
+          size: Math.random() > 0.8 ? 3 : 2,
+          blinkSpeed: Math.random() * 0.03 + 0.005,
+          alpha: Math.random()
+        });
+      }
+    }
+
+    function drawStars() {
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      for (let s of stars) {
+        s.alpha += s.blinkSpeed;
+        if (s.alpha > 1 || s.alpha < 0.15) s.blinkSpeed = -s.blinkSpeed;
+        ctx.fillStyle = s.alpha > 0.55 ? '#ffffff' : '#71717a';
+        ctx.fillRect(s.x, s.y, s.size, s.size);
+      }
+      requestAnimationFrame(drawStars);
+    }
+
+    window.addEventListener('resize', resizeStarfield);
+    resizeStarfield();
+    drawStars();
+
+    /* =========================================================
+       2. SPLASH SCREEN CONTROLS
+       ========================================================= */
+    function enterSite() {
+      const splash = document.getElementById('intro-splash');
+      splash.classList.add('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function reopenSplash() {
+      const splash = document.getElementById('intro-splash');
+      splash.classList.remove('hidden');
+    }
+
+    /* =========================================================
+       3. BILINGUAL DICTIONARY & SECTION ROUTING
+       ========================================================= */
+    const i18nDict = {
+      en: {
+        nowServingLabel: "NOW SERVING",
+        brandName: "SHAHRIYAR MOMENY",
+        brandRole: "Graphic Designer • Illustrator • Concept Artist • Animation & Game Dev",
+        navHome: "00. Info",
+        navBlog: "01. Blog",
+        navAnim: "02. Animation",
+        navGraphic: "03. Graphic",
+        navIllus: "04. Illustration",
+        navGame: "05. Game",
+        langBtn: "FA / فارسی",
+        arcadeBtn: "[ ARCADE SCREEN ]",
+        heroLabel: "// 00. ARCHITECTURAL DOSSIER & BANNER",
+        heroTitle: "GRAPHIC DESIGNER • ILLUSTRATOR • CONCEPT ARTIST • ANIMATION & GAME DEV",
+        heroDesc: "Hello, I am Shahriyar. This is my sketchbook & work log from recent times. I will be sharing more of my works here.",
+        receiptHeader: "ORDER SPECIFICATION",
+        blogHeader: "01 // JOURNAL & WORK LOGS",
+        emptyNotice: "[ This section is currently under construction. Content will be added soon. ]",
+        footerCopy: "© 2026 SHAHRIYAR MOMENY — MONOCHROME PIXEL ARCHITECTURE"
+      },
+      fa: {
+        nowServingLabel: "نوبتِ نمایش",
+        brandName: "شهریار مومنی",
+        brandRole: "گرافیک دیزاینر • تصویرساز • کانسپت آرتیست • توسعه‌دهنده انیمیشن و بازی",
+        navHome: "۰۰. اطلاعات",
+        navBlog: "۰۱. وبلاگ",
+        navAnim: "۰۲. انیمیشن",
+        navGraphic: "۰۳. گرافیک",
+        navIllus: "۰۴. تصویرسازی",
+        navGame: "۰۵. بازی",
+        langBtn: "EN / ENGLISH",
+        arcadeBtn: "[ صفحه شروع بازی ]",
+        heroLabel: "// پرونده معماری و بنر معرفی",
+        heroTitle: "گرافیک دیزاینر، تصویرساز، کانسپت آرتیست و توسعه‌دهنده انیمیشن و ویدیو گیم",
+        heroDesc: "سلام من شهریار هستم این هم دفترچه کارهای من در چندوقت گذشته سعی میکنم بیشتر کارهام رو به اشتراک بزارم",
+        receiptHeader: "مشخصات پرونده و آثار",
+        blogHeader: "۰۱ // وبلاگ و یادداشت‌ها",
+        emptyNotice: "[ این بخش در حال آماده‌سازی است. به‌زودی مطالب و نمونه‌کارها اضافه خواهند شد. ]",
+        footerCopy: "© ۲۰۲۶ شهریار مومنی — معماری مونوکروم پیکسلی"
+      }
+    };
+
+    const sectionTitles = {
+      home: "00 // INFO DOSSIER",
+      blog: "01 // BLOG & LOGS",
+      animation: "02 // ANIMATION REEL",
+      graphic: "03 // GRAPHIC DESIGN",
+      illustration: "04 // ILLUSTRATION",
+      game: "05 // 2D GAME DEV"
+    };
+
+    let currentLang = 'fa';
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      document.documentElement.lang = lang;
+      document.documentElement.dir = lang === 'fa' ? 'rtl' : 'ltr';
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (i18nDict[lang][key]) el.textContent = i18nDict[lang][key];
+      });
+    }
+
+    function toggleLanguage() {
+      setLanguage(currentLang === 'en' ? 'fa' : 'en');
+    }
+
+    function switchSection(sectionId) {
+      document.querySelectorAll('.page-view').forEach(v => v.style.display = 'none');
+      const targetView = document.getElementById('view-' + sectionId);
+      if (targetView) targetView.style.display = 'block';
+
+      let activeTicket = '#00';
+      document.querySelectorAll('.menu-tab').forEach(t => {
+        t.classList.remove('active');
+        if (t.getAttribute('data-target') === sectionId) {
+          t.classList.add('active');
+          activeTicket = t.getAttribute('data-ticket') || '#00';
+        }
+      });
+
+      document.getElementById('serving-ticket-num').textContent = activeTicket;
+      document.getElementById('serving-cat-name').textContent = sectionTitles[sectionId] || "00 // INFO";
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      setLanguage('fa');
+    });
+  </script>
+</body>
+</html>
