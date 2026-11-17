@@ -29,7 +29,6 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      image-rendering: pixelated;
     }
 
     html {
@@ -51,13 +50,14 @@
       position: relative;
     }
 
+    /* CRT Scanline & Dither Utilities */
     .scanlines::after {
       content: "";
       position: fixed;
       inset: 0;
       background: linear-gradient(
         rgba(18, 16, 16, 0) 50%, 
-        rgba(0, 0, 0, 0.35) 50%
+        rgba(0, 0, 0, 0.32) 50%
       );
       background-size: 100% 4px;
       pointer-events: none;
@@ -268,7 +268,111 @@
     }
 
     /* =========================================================
-       2. "NOW SERVING" PIXEL-ART MONOCHROME PORTFOLIO LAYOUT
+       2. FULLSCREEN IMAGE LIGHTBOX MODAL (WITH EXIT BUTTON)
+       ========================================================= */
+    #lightbox-modal {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(5, 5, 7, 0.96);
+      z-index: 8000;
+      display: none;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.25rem;
+      backdrop-filter: blur(4px);
+      direction: ltr;
+    }
+
+    #lightbox-modal.active {
+      display: flex;
+      animation: modalFadeIn 0.15s steps(3);
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.98); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .lightbox-top-bar {
+      width: 100%;
+      max-width: 1240px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-panel);
+      border: 2px solid var(--border-white);
+      padding: 0.65rem 1.15rem;
+      box-shadow: 4px 4px 0px var(--border-light);
+    }
+
+    .lightbox-caption {
+      font-family: var(--font-pixel);
+      font-size: 0.85rem;
+      color: var(--text-white);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .lightbox-exit-btn {
+      font-family: var(--font-arcade);
+      font-size: 0.78rem;
+      background: var(--text-white);
+      color: var(--bg-black);
+      border: 2px solid var(--border-white);
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      transition: all 0.1s steps(2);
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    .lightbox-exit-btn:hover {
+      background: var(--bg-black);
+      color: var(--text-white);
+      box-shadow: 3px 3px 0px var(--border-light);
+    }
+
+    .lightbox-stage {
+      flex-grow: 1;
+      width: 100%;
+      max-width: 1240px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1.25rem 0;
+      overflow: hidden;
+      cursor: zoom-out;
+    }
+
+    #lightbox-img {
+      max-width: 100%;
+      max-height: 80vh;
+      object-fit: contain;
+      border: 2px solid var(--border-white);
+      background: #0a0a0d;
+      box-shadow: 8px 8px 0px rgba(255, 255, 255, 0.2);
+      cursor: default;
+    }
+
+    .lightbox-bottom-bar {
+      width: 100%;
+      max-width: 1240px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-gray);
+      border-top: 1px dashed var(--border-dim);
+      padding-top: 0.65rem;
+    }
+
+    /* =========================================================
+       3. "NOW SERVING" PIXEL-ART MONOCHROME PORTFOLIO LAYOUT
        ========================================================= */
     .now-serving-shell {
       max-width: 1280px;
@@ -595,6 +699,7 @@
       box-shadow: 6px 6px 0px var(--border-light);
       margin-bottom: 1.75rem;
       position: relative;
+      cursor: zoom-in;
     }
 
     .hero-frame-bar {
@@ -667,6 +772,7 @@
       object-fit: contain;
       filter: grayscale(100%) contrast(1.25);
       transition: transform 0.2s steps(3), filter 0.2s;
+      cursor: zoom-in;
     }
 
     .sticker-img:hover {
@@ -776,6 +882,7 @@
       border: 1px solid currentColor;
     }
 
+    /* Portfolio Gallery Cards */
     .portfolio-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
@@ -791,6 +898,7 @@
       flex-direction: column;
       transition: all 0.15s steps(3);
       position: relative;
+      cursor: zoom-in;
     }
 
     .portfolio-card:hover {
@@ -832,6 +940,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      position: relative;
     }
 
     .portfolio-img {
@@ -928,7 +1037,7 @@
 <body class="scanlines">
 
   <!-- =========================================================
-       RETRO ARCADE SPLASH SCREEN ("BYE BYE GHOL")
+       1. RETRO ARCADE SPLASH SCREEN ("BYE BYE GHOL")
        ========================================================= -->
   <div id="intro-splash">
     <canvas id="starfield"></canvas>
@@ -956,14 +1065,31 @@
   </div>
 
   <!-- =========================================================
-       MAIN "NOW SERVING" PORTFOLIO APPLICATION
+       2. FULLSCREEN IMAGE LIGHTBOX MODAL
+       ========================================================= -->
+  <div id="lightbox-modal" role="dialog" aria-modal="true">
+    <div class="lightbox-top-bar">
+      <div class="lightbox-caption" id="lightbox-caption">FULLSCREEN PLATE VIEW</div>
+      <button class="lightbox-exit-btn" onclick="closeLightbox()">[ X / EXIT ]</button>
+    </div>
+    <div class="lightbox-stage" onclick="closeLightboxOnBg(event)">
+      <img id="lightbox-img" src="" alt="Fullscreen Artwork" />
+    </div>
+    <div class="lightbox-bottom-bar">
+      <span>SHAHRIYAR MOMENY // HIGH-RES ARCHIVE PLATE</span>
+      <span>PRESS [ESC] OR CLICK [EXIT] TO CLOSE</span>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       3. MAIN "NOW SERVING" PORTFOLIO APPLICATION
        ========================================================= -->
   <div class="now-serving-shell">
 
     <div class="ticker-wrap">
       <div class="ticker-move">
-        <span>★ NOW SERVING: SHAHRIYAR MOMENY PORTFOLIO ★ PIXEL-ART & MONOCHROME EDITION ★ GRAPHIC DESIGN • ILLUSTRATION • CONCEPT ART • ANIMATION & 2D GAME DEV ★ ISFAHAN, IR ★ PRESS [PLAY] TO BROWSE ORDERS ★&nbsp;&nbsp;&nbsp;&nbsp;</span>
-        <span>★ NOW SERVING: SHAHRIYAR MOMENY PORTFOLIO ★ PIXEL-ART & MONOCHROME EDITION ★ GRAPHIC DESIGN • ILLUSTRATION • CONCEPT ART • ANIMATION & 2D GAME DEV ★ ISFAHAN, IR ★ PRESS [PLAY] TO BROWSE ORDERS ★&nbsp;&nbsp;&nbsp;&nbsp;</span>
+        <span>★ NOW SERVING: SHAHRIYAR MOMENY PORTFOLIO ★ PIXEL-ART & MONOCHROME EDITION ★ GRAPHIC DESIGN • ILLUSTRATION • CONCEPT ART • ANIMATION & 2D GAME DEV ★ CLICK ANY IMAGE FOR FULLSCREEN ★&nbsp;&nbsp;&nbsp;&nbsp;</span>
+        <span>★ NOW SERVING: SHAHRIYAR MOMENY PORTFOLIO ★ PIXEL-ART & MONOCHROME EDITION ★ GRAPHIC DESIGN • ILLUSTRATION • CONCEPT ART • ANIMATION & 2D GAME DEV ★ CLICK ANY IMAGE FOR FULLSCREEN ★&nbsp;&nbsp;&nbsp;&nbsp;</span>
       </div>
     </div>
 
@@ -1035,9 +1161,9 @@
           <div class="hero-frame">
             <div class="hero-frame-bar">
               <span>FEATURED ORDER // PLATE_00</span>
-              <span>1-BIT MONOCHROME RENDER</span>
+              <span>[ CLICK TO EXPAND FULLSCREEN ]</span>
             </div>
-            <img data-smart-src="Untitled-1" alt="Shahriyar Momeny Hero Banner" class="hero-banner" />
+            <img data-smart-src="Untitled-1" alt="Shahriyar Momeny Hero Banner" class="hero-banner zoomable-img" />
           </div>
 
           <h1 class="hero-headline" data-i18n="heroTitle">
@@ -1045,14 +1171,14 @@
           </h1>
 
           <p class="hero-bio" data-i18n="heroDesc">
-            سلام من شهریار هستم این هم دفترچه کارهای من در چندوقت گذشته سعی میکنم بیشتر کارهام رو به اشتراک بزارم
+            Hello, I am Shahriyar. This is my sketchbook & work log from recent times. I will be sharing more of my works here.
           </p>
 
           <div class="sticker-strip">
             <div class="sticker-items">
-              <img data-smart-src="هه-01" alt="Fire Flower Decor" class="sticker-img" />
-              <img data-smart-src="زطزطزطزطزطزطزط-01" alt="Birds Decor" class="sticker-img" />
-              <img data-smart-src="ت-01" alt="Sun Decor" class="sticker-img" />
+              <img data-smart-src="هه-01" alt="Fire Flower Decor" class="sticker-img zoomable-img" />
+              <img data-smart-src="زطزطزطزطزطزطزط-01" alt="Birds Decor" class="sticker-img zoomable-img" />
+              <img data-smart-src="ت-01" alt="Sun Decor" class="sticker-img zoomable-img" />
             </div>
             <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-gray);">
               STAMPED & VERIFIED // 2026
@@ -1140,7 +1266,7 @@
         <span class="category-count">STATUS: IN PREPARATION</span>
       </div>
       <div class="empty-notice" data-i18n="emptyNotice">
-        [ بخش وبلاگ در حال آماده‌سازی است. به‌زودی مقالات و یادداشت‌ها اضافه خواهند شد. ]
+        [ This section is currently under construction. Content will be added soon. ]
       </div>
     </section>
 
@@ -1156,53 +1282,53 @@
       <div class="portfolio-grid">
         <div class="portfolio-card">
           <div class="card-ticket-top"><span class="ticket-id">ORDER #A01</span><span class="ticket-spec">ANIMATION</span></div>
-          <div class="card-img-wrap"><img data-smart-src="عع-01" alt="Anim 1" class="portfolio-img" /></div>
-          <div class="card-ticket-bottom"><span>PLATE_01</span><span>MONOCHROME / HOVER COLOR</span></div>
+          <div class="card-img-wrap"><img data-smart-src="عع-01" alt="ORDER #A01 — Animation" class="portfolio-img zoomable-img" /></div>
+          <div class="card-ticket-bottom"><span>PLATE_01</span><span>[ CLICK FOR FULLSCREEN ]</span></div>
         </div>
         <div class="portfolio-card">
           <div class="card-ticket-top"><span class="ticket-id">ORDER #A02</span><span class="ticket-spec">ANIMATION</span></div>
-          <div class="card-img-wrap"><img data-smart-src="اتغق-01" alt="Anim 2" class="portfolio-img" /></div>
-          <div class="card-ticket-bottom"><span>PLATE_02</span><span>MONOCHROME / HOVER COLOR</span></div>
+          <div class="card-img-wrap"><img data-smart-src="اتغق-01" alt="ORDER #A02 — Animation" class="portfolio-img zoomable-img" /></div>
+          <div class="card-ticket-bottom"><span>PLATE_02</span><span>[ CLICK FOR FULLSCREEN ]</span></div>
         </div>
         <div class="portfolio-card">
           <div class="card-ticket-top"><span class="ticket-id">ORDER #A03</span><span class="ticket-spec">ANIMATION</span></div>
-          <div class="card-img-wrap"><img data-smart-src="حححح-01" alt="Anim 3" class="portfolio-img" /></div>
-          <div class="card-ticket-bottom"><span>PLATE_03</span><span>MONOCHROME / HOVER COLOR</span></div>
+          <div class="card-img-wrap"><img data-smart-src="حححح-01" alt="ORDER #A03 — Animation" class="portfolio-img zoomable-img" /></div>
+          <div class="card-ticket-bottom"><span>PLATE_03</span><span>[ CLICK FOR FULLSCREEN ]</span></div>
         </div>
         <div class="portfolio-card">
           <div class="card-ticket-top"><span class="ticket-id">ORDER #A04</span><span class="ticket-spec">ANIMATION</span></div>
-          <div class="card-img-wrap"><img data-smart-src="زرزرزر-01" alt="Anim 4" class="portfolio-img" /></div>
-          <div class="card-ticket-bottom"><span>PLATE_04</span><span>MONOCHROME / HOVER COLOR</span></div>
+          <div class="card-img-wrap"><img data-smart-src="زرزرزر-01" alt="ORDER #A04 — Animation" class="portfolio-img zoomable-img" /></div>
+          <div class="card-ticket-bottom"><span>PLATE_04</span><span>[ CLICK FOR FULLSCREEN ]</span></div>
         </div>
         <div class="portfolio-card">
           <div class="card-ticket-top"><span class="ticket-id">ORDER #A05</span><span class="ticket-spec">ANIMATION</span></div>
-          <div class="card-img-wrap"><img data-smart-src="ززز-01" alt="Anim 5" class="portfolio-img" /></div>
-          <div class="card-ticket-bottom"><span>PLATE_05</span><span>MONOCHROME / HOVER COLOR</span></div>
+          <div class="card-img-wrap"><img data-smart-src="ززز-01" alt="ORDER #A05 — Animation" class="portfolio-img zoomable-img" /></div>
+          <div class="card-ticket-bottom"><span>PLATE_05</span><span>[ CLICK FOR FULLSCREEN ]</span></div>
         </div>
         <div class="portfolio-card">
           <div class="card-ticket-top"><span class="ticket-id">ORDER #A06</span><span class="ticket-spec">ANIMATION</span></div>
-          <div class="card-img-wrap"><img data-smart-src="ززززطظ-01" alt="Anim 6" class="portfolio-img" /></div>
-          <div class="card-ticket-bottom"><span>PLATE_06</span><span>MONOCHROME / HOVER COLOR</span></div>
+          <div class="card-img-wrap"><img data-smart-src="ززززطظ-01" alt="ORDER #A06 — Animation" class="portfolio-img zoomable-img" /></div>
+          <div class="card-ticket-bottom"><span>PLATE_06</span><span>[ CLICK FOR FULLSCREEN ]</span></div>
         </div>
         <div class="portfolio-card">
           <div class="card-ticket-top"><span class="ticket-id">ORDER #A07</span><span class="ticket-spec">ANIMATION</span></div>
-          <div class="card-img-wrap"><img data-smart-src="زطزطزرذ-01" alt="Anim 7" class="portfolio-img" /></div>
-          <div class="card-ticket-bottom"><span>PLATE_07</span><span>MONOCHROME / HOVER COLOR</span></div>
+          <div class="card-img-wrap"><img data-smart-src="زطزطزرذ-01" alt="ORDER #A07 — Animation" class="portfolio-img zoomable-img" /></div>
+          <div class="card-ticket-bottom"><span>PLATE_07</span><span>[ CLICK FOR FULLSCREEN ]</span></div>
         </div>
         <div class="portfolio-card">
           <div class="card-ticket-top"><span class="ticket-id">ORDER #A08</span><span class="ticket-spec">ANIMATION</span></div>
-          <div class="card-img-wrap"><img data-smart-src="طزطزطزط-01" alt="Anim 8" class="portfolio-img" /></div>
-          <div class="card-ticket-bottom"><span>PLATE_08</span><span>MONOCHROME / HOVER COLOR</span></div>
+          <div class="card-img-wrap"><img data-smart-src="طزطزطزط-01" alt="ORDER #A08 — Animation" class="portfolio-img zoomable-img" /></div>
+          <div class="card-ticket-bottom"><span>PLATE_08</span><span>[ CLICK FOR FULLSCREEN ]</span></div>
         </div>
         <div class="portfolio-card">
           <div class="card-ticket-top"><span class="ticket-id">ORDER #A09</span><span class="ticket-spec">ANIMATION</span></div>
-          <div class="card-img-wrap"><img data-smart-src="ظظط-01" alt="Anim 9" class="portfolio-img" /></div>
-          <div class="card-ticket-bottom"><span>PLATE_09</span><span>MONOCHROME / HOVER COLOR</span></div>
+          <div class="card-img-wrap"><img data-smart-src="ظظط-01" alt="ORDER #A09 — Animation" class="portfolio-img zoomable-img" /></div>
+          <div class="card-ticket-bottom"><span>PLATE_09</span><span>[ CLICK FOR FULLSCREEN ]</span></div>
         </div>
         <div class="portfolio-card">
           <div class="card-ticket-top"><span class="ticket-id">ORDER #A10</span><span class="ticket-spec">ANIMATION</span></div>
-          <div class="card-img-wrap"><img data-smart-src="ززززررز-01" alt="Anim 10" class="portfolio-img" /></div>
-          <div class="card-ticket-bottom"><span>PLATE_10</span><span>MONOCHROME / HOVER COLOR</span></div>
+          <div class="card-img-wrap"><img data-smart-src="ززززررز-01" alt="ORDER #A10 — Animation" class="portfolio-img zoomable-img" /></div>
+          <div class="card-ticket-bottom"><span>PLATE_10</span><span>[ CLICK FOR FULLSCREEN ]</span></div>
         </div>
       </div>
     </section>
@@ -1219,33 +1345,33 @@
       <div class="portfolio-grid">
         <div class="portfolio-card">
           <div class="card-ticket-top"><span class="ticket-id">ORDER #G01</span><span class="ticket-spec">GRAPHIC</span></div>
-          <div class="card-img-wrap"><img data-smart-src="ئائار-01" alt="Graphic 1" class="portfolio-img" /></div>
-          <div class="card-ticket-bottom"><span>POSTER_01</span><span>MONOCHROME / HOVER COLOR</span></div>
+          <div class="card-img-wrap"><img data-smart-src="ئائار-01" alt="ORDER #G01 — Graphic Design" class="portfolio-img zoomable-img" /></div>
+          <div class="card-ticket-bottom"><span>POSTER_01</span><span>[ CLICK FOR FULLSCREEN ]</span></div>
         </div>
         <div class="portfolio-card">
           <div class="card-ticket-top"><span class="ticket-id">ORDER #G02</span><span class="ticket-spec">GRAPHIC</span></div>
-          <div class="card-img-wrap"><img data-smart-src="مممممم-01" alt="Graphic 2" class="portfolio-img" /></div>
-          <div class="card-ticket-bottom"><span>POSTER_02</span><span>MONOCHROME / HOVER COLOR</span></div>
+          <div class="card-img-wrap"><img data-smart-src="مممممم-01" alt="ORDER #G02 — Graphic Design" class="portfolio-img zoomable-img" /></div>
+          <div class="card-ticket-bottom"><span>POSTER_02</span><span>[ CLICK FOR FULLSCREEN ]</span></div>
         </div>
         <div class="portfolio-card">
           <div class="card-ticket-top"><span class="ticket-id">ORDER #G03</span><span class="ticket-spec">GRAPHIC</span></div>
-          <div class="card-img-wrap"><img data-smart-src="هحخ-01" alt="Graphic 3" class="portfolio-img" /></div>
-          <div class="card-ticket-bottom"><span>POSTER_03</span><span>MONOCHROME / HOVER COLOR</span></div>
+          <div class="card-img-wrap"><img data-smart-src="هحخ-01" alt="ORDER #G03 — Graphic Design" class="portfolio-img zoomable-img" /></div>
+          <div class="card-ticket-bottom"><span>POSTER_03</span><span>[ CLICK FOR FULLSCREEN ]</span></div>
         </div>
         <div class="portfolio-card">
           <div class="card-ticket-top"><span class="ticket-id">ORDER #G04</span><span class="ticket-spec">GRAPHIC</span></div>
-          <div class="card-img-wrap"><img data-smart-src="ئائا-01" alt="Graphic 4" class="portfolio-img" /></div>
-          <div class="card-ticket-bottom"><span>POSTER_04</span><span>MONOCHROME / HOVER COLOR</span></div>
+          <div class="card-img-wrap"><img data-smart-src="ئائا-01" alt="ORDER #G04 — Graphic Design" class="portfolio-img zoomable-img" /></div>
+          <div class="card-ticket-bottom"><span>POSTER_04</span><span>[ CLICK FOR FULLSCREEN ]</span></div>
         </div>
         <div class="portfolio-card">
           <div class="card-ticket-top"><span class="ticket-id">ORDER #G05</span><span class="ticket-spec">GRAPHIC</span></div>
-          <div class="card-img-wrap"><img data-smart-src="زطزطزطزط-01" alt="Graphic 5" class="portfolio-img" /></div>
-          <div class="card-ticket-bottom"><span>POSTER_05</span><span>MONOCHROME / HOVER COLOR</span></div>
+          <div class="card-img-wrap"><img data-smart-src="زطزطزطزط-01" alt="ORDER #G05 — Graphic Design" class="portfolio-img zoomable-img" /></div>
+          <div class="card-ticket-bottom"><span>POSTER_05</span><span>[ CLICK FOR FULLSCREEN ]</span></div>
         </div>
         <div class="portfolio-card">
           <div class="card-ticket-top"><span class="ticket-id">ORDER #G06</span><span class="ticket-spec">GRAPHIC</span></div>
-          <div class="card-img-wrap"><img data-smart-src="زطزطزطزطزطزطزط-01" alt="Graphic 6" class="portfolio-img" /></div>
-          <div class="card-ticket-bottom"><span>POSTER_06</span><span>MONOCHROME / HOVER COLOR</span></div>
+          <div class="card-img-wrap"><img data-smart-src="زطزطزطزطزطزطزط-01" alt="ORDER #G06 — Graphic Design" class="portfolio-img zoomable-img" /></div>
+          <div class="card-ticket-bottom"><span>POSTER_06</span><span>[ CLICK FOR FULLSCREEN ]</span></div>
         </div>
       </div>
     </section>
@@ -1262,78 +1388,78 @@
       <div class="portfolio-grid">
         <div class="portfolio-card">
           <div class="card-ticket-top"><span class="ticket-id">ORDER #I01</span><span class="ticket-spec">ILLUSTRATION</span></div>
-          <div class="card-img-wrap"><img data-smart-src="ذببل-01" alt="Illus 1" class="portfolio-img" /></div>
-          <div class="card-ticket-bottom"><span>CONCEPT_01</span><span>MONOCHROME / HOVER COLOR</span></div>
+          <div class="card-img-wrap"><img data-smart-src="ذببل-01" alt="ORDER #I01 — Illustration" class="portfolio-img zoomable-img" /></div>
+          <div class="card-ticket-bottom"><span>CONCEPT_01</span><span>[ CLICK FOR FULLSCREEN ]</span></div>
         </div>
         <div class="portfolio-card">
           <div class="card-ticket-top"><span class="ticket-id">ORDER #I02</span><span class="ticket-spec">ILLUSTRATION</span></div>
-          <div class="card-img-wrap"><img data-smart-src="ذذلل-01" alt="Illus 2" class="portfolio-img" /></div>
-          <div class="card-ticket-bottom"><span>CONCEPT_02</span><span>MONOCHROME / HOVER COLOR</span></div>
+          <div class="card-img-wrap"><img data-smart-src="ذذلل-01" alt="ORDER #I02 — Illustration" class="portfolio-img zoomable-img" /></div>
+          <div class="card-ticket-bottom"><span>CONCEPT_02</span><span>[ CLICK FOR FULLSCREEN ]</span></div>
         </div>
         <div class="portfolio-card">
           <div class="card-ticket-top"><span class="ticket-id">ORDER #I03</span><span class="ticket-spec">ILLUSTRATION</span></div>
-          <div class="card-img-wrap"><img data-smart-src="ذربلالذ-01" alt="Illus 3" class="portfolio-img" /></div>
-          <div class="card-ticket-bottom"><span>CONCEPT_03</span><span>MONOCHROME / HOVER COLOR</span></div>
+          <div class="card-img-wrap"><img data-smart-src="ذربلالذ-01" alt="ORDER #I03 — Illustration" class="portfolio-img zoomable-img" /></div>
+          <div class="card-ticket-bottom"><span>CONCEPT_03</span><span>[ CLICK FOR FULLSCREEN ]</span></div>
         </div>
         <div class="portfolio-card">
           <div class="card-ticket-top"><span class="ticket-id">ORDER #I04</span><span class="ticket-spec">ILLUSTRATION</span></div>
-          <div class="card-img-wrap"><img data-smart-src="باابب-01" alt="Illus 4" class="portfolio-img" /></div>
-          <div class="card-ticket-bottom"><span>CONCEPT_04</span><span>MONOCHROME / HOVER COLOR</span></div>
+          <div class="card-img-wrap"><img data-smart-src="باابب-01" alt="ORDER #I04 — Illustration" class="portfolio-img zoomable-img" /></div>
+          <div class="card-ticket-bottom"><span>CONCEPT_04</span><span>[ CLICK FOR FULLSCREEN ]</span></div>
         </div>
         <div class="portfolio-card">
           <div class="card-ticket-top"><span class="ticket-id">ORDER #I05</span><span class="ticket-spec">ILLUSTRATION</span></div>
-          <div class="card-img-wrap"><img data-smart-src="دا-01" alt="Illus 5" class="portfolio-img" /></div>
-          <div class="card-ticket-bottom"><span>CONCEPT_05</span><span>MONOCHROME / HOVER COLOR</span></div>
+          <div class="card-img-wrap"><img data-smart-src="دا-01" alt="ORDER #I05 — Illustration" class="portfolio-img zoomable-img" /></div>
+          <div class="card-ticket-bottom"><span>CONCEPT_05</span><span>[ CLICK FOR FULLSCREEN ]</span></div>
         </div>
         <div class="portfolio-card">
           <div class="card-ticket-top"><span class="ticket-id">ORDER #I06</span><span class="ticket-spec">ILLUSTRATION</span></div>
-          <div class="card-img-wrap"><img data-smart-src="ذلالا-01" alt="Illus 6" class="portfolio-img" /></div>
-          <div class="card-ticket-bottom"><span>CONCEPT_06</span><span>MONOCHROME / HOVER COLOR</span></div>
+          <div class="card-img-wrap"><img data-smart-src="ذلالا-01" alt="ORDER #I06 — Illustration" class="portfolio-img zoomable-img" /></div>
+          <div class="card-ticket-bottom"><span>CONCEPT_06</span><span>[ CLICK FOR FULLSCREEN ]</span></div>
         </div>
         <div class="portfolio-card">
           <div class="card-ticket-top"><span class="ticket-id">ORDER #I07</span><span class="ticket-spec">ILLUSTRATION</span></div>
-          <div class="card-img-wrap"><img data-smart-src="رربب-01" alt="Illus 7" class="portfolio-img" /></div>
-          <div class="card-ticket-bottom"><span>CONCEPT_07</span><span>MONOCHROME / HOVER COLOR</span></div>
+          <div class="card-img-wrap"><img data-smart-src="رربب-01" alt="ORDER #I07 — Illustration" class="portfolio-img zoomable-img" /></div>
+          <div class="card-ticket-bottom"><span>CONCEPT_07</span><span>[ CLICK FOR FULLSCREEN ]</span></div>
         </div>
         <div class="portfolio-card">
           <div class="card-ticket-top"><span class="ticket-id">ORDER #I08</span><span class="ticket-spec">ILLUSTRATION</span></div>
-          <div class="card-img-wrap"><img data-smart-src="ررز-01" alt="Illus 8" class="portfolio-img" /></div>
-          <div class="card-ticket-bottom"><span>CONCEPT_08</span><span>MONOCHROME / HOVER COLOR</span></div>
+          <div class="card-img-wrap"><img data-smart-src="ررز-01" alt="ORDER #I08 — Illustration" class="portfolio-img zoomable-img" /></div>
+          <div class="card-ticket-bottom"><span>CONCEPT_08</span><span>[ CLICK FOR FULLSCREEN ]</span></div>
         </div>
         <div class="portfolio-card">
           <div class="card-ticket-top"><span class="ticket-id">ORDER #I09</span><span class="ticket-spec">ILLUSTRATION</span></div>
-          <div class="card-img-wrap"><img data-smart-src="رز-01" alt="Illus 9" class="portfolio-img" /></div>
-          <div class="card-ticket-bottom"><span>CONCEPT_09</span><span>MONOCHROME / HOVER COLOR</span></div>
+          <div class="card-img-wrap"><img data-smart-src="رز-01" alt="ORDER #I09 — Illustration" class="portfolio-img zoomable-img" /></div>
+          <div class="card-ticket-bottom"><span>CONCEPT_09</span><span>[ CLICK FOR FULLSCREEN ]</span></div>
         </div>
         <div class="portfolio-card">
           <div class="card-ticket-top"><span class="ticket-id">ORDER #I10</span><span class="ticket-spec">ILLUSTRATION</span></div>
-          <div class="card-img-wrap"><img data-smart-src="ززرزرزر-01" alt="Illus 10" class="portfolio-img" /></div>
-          <div class="card-ticket-bottom"><span>CONCEPT_10</span><span>MONOCHROME / HOVER COLOR</span></div>
+          <div class="card-img-wrap"><img data-smart-src="ززرزرزر-01" alt="ORDER #I10 — Illustration" class="portfolio-img zoomable-img" /></div>
+          <div class="card-ticket-bottom"><span>CONCEPT_10</span><span>[ CLICK FOR FULLSCREEN ]</span></div>
         </div>
         <div class="portfolio-card">
           <div class="card-ticket-top"><span class="ticket-id">ORDER #I11</span><span class="ticket-spec">ILLUSTRATION</span></div>
-          <div class="card-img-wrap"><img data-smart-src="لتتاتا-01" alt="Illus 11" class="portfolio-img" /></div>
-          <div class="card-ticket-bottom"><span>CONCEPT_11</span><span>MONOCHROME / HOVER COLOR</span></div>
+          <div class="card-img-wrap"><img data-smart-src="لتتاتا-01" alt="ORDER #I11 — Illustration" class="portfolio-img zoomable-img" /></div>
+          <div class="card-ticket-bottom"><span>CONCEPT_11</span><span>[ CLICK FOR FULLSCREEN ]</span></div>
         </div>
         <div class="portfolio-card">
           <div class="card-ticket-top"><span class="ticket-id">ORDER #I12</span><span class="ticket-spec">ILLUSTRATION</span></div>
-          <div class="card-img-wrap"><img data-smart-src="نعع-01" alt="Illus 12" class="portfolio-img" /></div>
-          <div class="card-ticket-bottom"><span>CONCEPT_12</span><span>MONOCHROME / HOVER COLOR</span></div>
+          <div class="card-img-wrap"><img data-smart-src="نعع-01" alt="ORDER #I12 — Illustration" class="portfolio-img zoomable-img" /></div>
+          <div class="card-ticket-bottom"><span>CONCEPT_12</span><span>[ CLICK FOR FULLSCREEN ]</span></div>
         </div>
         <div class="portfolio-card">
           <div class="card-ticket-top"><span class="ticket-id">ORDER #I13</span><span class="ticket-spec">ILLUSTRATION</span></div>
-          <div class="card-img-wrap"><img data-smart-src="هخهخه-01" alt="Illus 13" class="portfolio-img" /></div>
-          <div class="card-ticket-bottom"><span>CONCEPT_13</span><span>MONOCHROME / HOVER COLOR</span></div>
+          <div class="card-img-wrap"><img data-smart-src="هخهخه-01" alt="ORDER #I13 — Illustration" class="portfolio-img zoomable-img" /></div>
+          <div class="card-ticket-bottom"><span>CONCEPT_13</span><span>[ CLICK FOR FULLSCREEN ]</span></div>
         </div>
         <div class="portfolio-card">
           <div class="card-ticket-top"><span class="ticket-id">ORDER #I14</span><span class="ticket-spec">ILLUSTRATION</span></div>
-          <div class="card-img-wrap"><img data-smart-src="زززظ-01" alt="Illus 14" class="portfolio-img" /></div>
-          <div class="card-ticket-bottom"><span>CONCEPT_14</span><span>MONOCHROME / HOVER COLOR</span></div>
+          <div class="card-img-wrap"><img data-smart-src="زززظ-01" alt="ORDER #I14 — Illustration" class="portfolio-img zoomable-img" /></div>
+          <div class="card-ticket-bottom"><span>CONCEPT_14</span><span>[ CLICK FOR FULLSCREEN ]</span></div>
         </div>
         <div class="portfolio-card">
           <div class="card-ticket-top"><span class="ticket-id">ORDER #I15</span><span class="ticket-spec">ILLUSTRATION</span></div>
-          <div class="card-img-wrap"><img data-smart-src="زططط-01" alt="Illus 15" class="portfolio-img" /></div>
-          <div class="card-ticket-bottom"><span>CONCEPT_15</span><span>MONOCHROME / HOVER COLOR</span></div>
+          <div class="card-img-wrap"><img data-smart-src="زططط-01" alt="ORDER #I15 — Illustration" class="portfolio-img zoomable-img" /></div>
+          <div class="card-ticket-bottom"><span>CONCEPT_15</span><span>[ CLICK FOR FULLSCREEN ]</span></div>
         </div>
       </div>
     </section>
@@ -1350,48 +1476,48 @@
       <div class="portfolio-grid">
         <div class="portfolio-card">
           <div class="card-ticket-top"><span class="ticket-id">ORDER #GM01</span><span class="ticket-spec">GAME DEV</span></div>
-          <div class="card-img-wrap"><img data-smart-src="ظظظظظظ-01" alt="Game 1" class="portfolio-img" /></div>
-          <div class="card-ticket-bottom"><span>ASSET_01</span><span>MONOCHROME / HOVER COLOR</span></div>
+          <div class="card-img-wrap"><img data-smart-src="ظظظظظظ-01" alt="ORDER #GM01 — Game Dev" class="portfolio-img zoomable-img" /></div>
+          <div class="card-ticket-bottom"><span>ASSET_01</span><span>[ CLICK FOR FULLSCREEN ]</span></div>
         </div>
         <div class="portfolio-card">
           <div class="card-ticket-top"><span class="ticket-id">ORDER #GM02</span><span class="ticket-spec">GAME DEV</span></div>
-          <div class="card-img-wrap"><img data-smart-src="اتت-01" alt="Game 2" class="portfolio-img" /></div>
-          <div class="card-ticket-bottom"><span>ASSET_02</span><span>MONOCHROME / HOVER COLOR</span></div>
+          <div class="card-img-wrap"><img data-smart-src="اتت-01" alt="ORDER #GM02 — Game Dev" class="portfolio-img zoomable-img" /></div>
+          <div class="card-ticket-bottom"><span>ASSET_02</span><span>[ CLICK FOR FULLSCREEN ]</span></div>
         </div>
         <div class="portfolio-card">
           <div class="card-ticket-top"><span class="ticket-id">ORDER #GM03</span><span class="ticket-spec">GAME DEV</span></div>
-          <div class="card-img-wrap"><img data-smart-src="خخ-01" alt="Game 3" class="portfolio-img" /></div>
-          <div class="card-ticket-bottom"><span>ASSET_03</span><span>MONOCHROME / HOVER COLOR</span></div>
+          <div class="card-img-wrap"><img data-smart-src="خخ-01" alt="ORDER #GM03 — Game Dev" class="portfolio-img zoomable-img" /></div>
+          <div class="card-ticket-bottom"><span>ASSET_03</span><span>[ CLICK FOR FULLSCREEN ]</span></div>
         </div>
         <div class="portfolio-card">
           <div class="card-ticket-top"><span class="ticket-id">ORDER #GM04</span><span class="ticket-spec">GAME DEV</span></div>
-          <div class="card-img-wrap"><img data-smart-src="طط-01" alt="Game 4" class="portfolio-img" /></div>
-          <div class="card-ticket-bottom"><span>ASSET_04</span><span>MONOCHROME / HOVER COLOR</span></div>
+          <div class="card-img-wrap"><img data-smart-src="طط-01" alt="ORDER #GM04 — Game Dev" class="portfolio-img zoomable-img" /></div>
+          <div class="card-ticket-bottom"><span>ASSET_04</span><span>[ CLICK FOR FULLSCREEN ]</span></div>
         </div>
         <div class="portfolio-card">
           <div class="card-ticket-top"><span class="ticket-id">ORDER #GM05</span><span class="ticket-spec">GAME DEV</span></div>
-          <div class="card-img-wrap"><img data-smart-src="طططز-01" alt="Game 5" class="portfolio-img" /></div>
-          <div class="card-ticket-bottom"><span>ASSET_05</span><span>MONOCHROME / HOVER COLOR</span></div>
+          <div class="card-img-wrap"><img data-smart-src="طططز-01" alt="ORDER #GM05 — Game Dev" class="portfolio-img zoomable-img" /></div>
+          <div class="card-ticket-bottom"><span>ASSET_05</span><span>[ CLICK FOR FULLSCREEN ]</span></div>
         </div>
         <div class="portfolio-card">
           <div class="card-ticket-top"><span class="ticket-id">ORDER #GM06</span><span class="ticket-spec">GAME DEV</span></div>
-          <div class="card-img-wrap"><img data-smart-src="ئئد-01" alt="Game 6" class="portfolio-img" /></div>
-          <div class="card-ticket-bottom"><span>ASSET_06</span><span>MONOCHROME / HOVER COLOR</span></div>
+          <div class="card-img-wrap"><img data-smart-src="ئئد-01" alt="ORDER #GM06 — Game Dev" class="portfolio-img zoomable-img" /></div>
+          <div class="card-ticket-bottom"><span>ASSET_06</span><span>[ CLICK FOR FULLSCREEN ]</span></div>
         </div>
         <div class="portfolio-card">
           <div class="card-ticket-top"><span class="ticket-id">ORDER #GM07</span><span class="ticket-spec">GAME DEV</span></div>
-          <div class="card-img-wrap"><img data-smart-src="ظظظظظظظظظ-01" alt="Game 7" class="portfolio-img" /></div>
-          <div class="card-ticket-bottom"><span>ASSET_07</span><span>MONOCHROME / HOVER COLOR</span></div>
+          <div class="card-img-wrap"><img data-smart-src="ظظظظظظظظظ-01" alt="ORDER #GM07 — Game Dev" class="portfolio-img zoomable-img" /></div>
+          <div class="card-ticket-bottom"><span>ASSET_07</span><span>[ CLICK FOR FULLSCREEN ]</span></div>
         </div>
         <div class="portfolio-card">
           <div class="card-ticket-top"><span class="ticket-id">ORDER #GM08</span><span class="ticket-spec">GAME DEV</span></div>
-          <div class="card-img-wrap"><img data-smart-src="فغغ-01" alt="Game 8" class="portfolio-img" /></div>
-          <div class="card-ticket-bottom"><span>ASSET_08</span><span>MONOCHROME / HOVER COLOR</span></div>
+          <div class="card-img-wrap"><img data-smart-src="فغغ-01" alt="ORDER #GM08 — Game Dev" class="portfolio-img zoomable-img" /></div>
+          <div class="card-ticket-bottom"><span>ASSET_08</span><span>[ CLICK FOR FULLSCREEN ]</span></div>
         </div>
         <div class="portfolio-card">
           <div class="card-ticket-top"><span class="ticket-id">ORDER #GM09</span><span class="ticket-spec">GAME DEV</span></div>
-          <div class="card-img-wrap"><img data-smart-src="ممن-01" alt="Game 9" class="portfolio-img" /></div>
-          <div class="card-ticket-bottom"><span>ASSET_09</span><span>MONOCHROME / HOVER COLOR</span></div>
+          <div class="card-img-wrap"><img data-smart-src="ممن-01" alt="ORDER #GM09 — Game Dev" class="portfolio-img zoomable-img" /></div>
+          <div class="card-ticket-bottom"><span>ASSET_09</span><span>[ CLICK FOR FULLSCREEN ]</span></div>
         </div>
       </div>
     </section>
@@ -1409,10 +1535,44 @@
 
   <script>
     /* =========================================================
-       1. SMART AUTO-RESOLVER FOR IMAGE PATHS & EXTENSIONS
-       Checks root, "Untitled-1.webp" prefix, and subfolders automatically!
+       1. GITHUB API & MULTI-REPO SMART IMAGE DISCOVERY ENGINE
+       Automatically finds images across both 'my-portfolio' and
+       'portfolio' repositories and any subfolder structure!
        ========================================================= */
-    function initSmartImages() {
+    async function initSmartImages() {
+      const owner = 'momenyshahriyar-svg';
+      const repos = ['my-portfolio', 'portfolio'];
+      const branches = ['main', 'master'];
+      const discoveredFiles = [];
+
+      // Query GitHub Trees API to index all uploaded image files across both repos
+      for (const repo of repos) {
+        for (const branch of branches) {
+          try {
+            const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/git/trees/${branch}?recursive=1`);
+            if (res.ok) {
+              const data = await res.json();
+              if (data.tree) {
+                data.tree.forEach(item => {
+                  if (item.type === 'blob' && /\.(webp|jpg|jpeg|png|gif)$/i.test(item.path)) {
+                    const encodedPath = item.path.split('/').map(encodeURIComponent).join('/');
+                    discoveredFiles.push({
+                      path: item.path,
+                      filename: item.path.split('/').pop(),
+                      rawUrl: `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${encodedPath}`,
+                      pagesUrl: `https://${owner}.github.io/${repo}/${encodedPath}`
+                    });
+                  }
+                });
+              }
+              break;
+            }
+          } catch (e) {
+            // Fallback to local brute-force paths if offline or rate-limited
+          }
+        }
+      }
+
       const prefixes = [
         "",
         "Untitled-1.webp",
@@ -1430,32 +1590,108 @@
       const extensions = [".webp", ".jpg", ".png", ".jpeg"];
 
       document.querySelectorAll('img[data-smart-src]').forEach(img => {
-        const base = img.getAttribute('data-smart-src');
+        const key = img.getAttribute('data-smart-src').normalize('NFC');
         const candidates = [];
 
-        if (base === "Untitled-1") {
-          candidates.push("Untitled-1.webp", "Untitled-1.jpg", "Untitled-1.png");
-        } else {
-          for (const pref of prefixes) {
-            for (const ext of extensions) {
-              candidates.push(pref + base + ext);
+        // 1. Match against discovered GitHub repo files first
+        if (discoveredFiles.length > 0) {
+          for (const file of discoveredFiles) {
+            const normFile = file.filename.normalize('NFC');
+            const nameWithoutExt = normFile.replace(/\.(webp|jpg|jpeg|png|gif)$/i, '');
+            const cleanName = nameWithoutExt.replace(/^Untitled-1(\.webp)?/i, '');
+
+            if (key === "Untitled-1") {
+              if (nameWithoutExt.toLowerCase() === "untitled-1") {
+                candidates.push(file.rawUrl, file.pagesUrl);
+              }
+            } else if (
+              cleanName === key ||
+              nameWithoutExt === key ||
+              normFile.includes(key)
+            ) {
+              candidates.push(file.rawUrl, file.pagesUrl);
             }
           }
         }
 
-        let index = 0;
-        function tryNext() {
-          if (index < candidates.length) {
-            img.src = candidates[index++];
+        // 2. Local and cross-repo direct path fallbacks
+        if (key === "Untitled-1") {
+          candidates.push(
+            "Untitled-1.webp",
+            "Untitled-1.jpg",
+            "Untitled-1.png",
+            "https://raw.githubusercontent.com/momenyshahriyar-svg/my-portfolio/main/Untitled-1.webp",
+            "https://raw.githubusercontent.com/momenyshahriyar-svg/portfolio/main/Untitled-1.webp"
+          );
+        } else {
+          for (const pref of prefixes) {
+            for (const ext of extensions) {
+              const rel = pref + key + ext;
+              const encodedRel = rel.split('/').map(encodeURIComponent).join('/');
+              candidates.push(rel);
+              candidates.push(`https://raw.githubusercontent.com/${owner}/my-portfolio/main/${encodedRel}`);
+              candidates.push(`https://raw.githubusercontent.com/${owner}/portfolio/main/${encodedRel}`);
+            }
           }
         }
+
+        const uniqueCandidates = [...new Set(candidates)];
+        let idx = 0;
+
+        function tryNext() {
+          if (idx < uniqueCandidates.length) {
+            img.src = uniqueCandidates[idx++];
+          }
+        }
+
         img.onerror = tryNext;
         tryNext();
       });
     }
 
     /* =========================================================
-       2. RETRO PIXEL STARFIELD CANVAS FOR SPLASH SCREEN
+       2. FULLSCREEN LIGHTBOX CONTROLLER
+       ========================================================= */
+    function initLightbox() {
+      document.querySelectorAll('.portfolio-card, .hero-frame, .sticker-img').forEach(el => {
+        el.addEventListener('click', (e) => {
+          const targetImg = el.tagName === 'IMG' ? el : el.querySelector('img');
+          if (!targetImg || !targetImg.src) return;
+          const labelEl = el.querySelector('.ticket-id');
+          const title = labelEl ? labelEl.textContent : (targetImg.alt || 'FULLSCREEN PLATE');
+          openLightbox(targetImg.src, title);
+        });
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeLightbox();
+      });
+    }
+
+    function openLightbox(src, caption) {
+      const modal = document.getElementById('lightbox-modal');
+      const modalImg = document.getElementById('lightbox-img');
+      const modalCap = document.getElementById('lightbox-caption');
+      modalImg.src = src;
+      modalCap.textContent = caption;
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+      const modal = document.getElementById('lightbox-modal');
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    function closeLightboxOnBg(event) {
+      if (event.target.id === 'lightbox-stage' || event.target.classList.contains('lightbox-stage')) {
+        closeLightbox();
+      }
+    }
+
+    /* =========================================================
+       3. RETRO PIXEL STARFIELD CANVAS FOR SPLASH SCREEN
        ========================================================= */
     const canvas = document.getElementById('starfield');
     const ctx = canvas.getContext('2d');
@@ -1498,7 +1734,7 @@
     drawStars();
 
     /* =========================================================
-       3. SPLASH SCREEN CONTROLS
+       4. SPLASH SCREEN CONTROLS
        ========================================================= */
     function enterSite() {
       const splash = document.getElementById('intro-splash');
@@ -1512,7 +1748,7 @@
     }
 
     /* =========================================================
-       4. BILINGUAL DICTIONARY & SECTION ROUTING
+       5. BILINGUAL DICTIONARY & SECTION ROUTING (DEFAULT: EN)
        ========================================================= */
     const i18nDict = {
       en: {
@@ -1566,7 +1802,8 @@
       game: "05 // 2D GAME DEV"
     };
 
-    let currentLang = 'fa';
+    // Default language set to English ('en')
+    let currentLang = 'en';
 
     function setLanguage(lang) {
       currentLang = lang;
@@ -1602,8 +1839,9 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      setLanguage('fa');
+      setLanguage('en');
       initSmartImages();
+      initLightbox();
     });
   </script>
 </body>
